@@ -1,0 +1,9 @@
+// BrowserSync Configuration
+
+// These folders are watched for activity and the pages
+// are reloaded if anything changes in them.
+{
+  "server": {
+    "baseDir": ["./src", "./build/contracts"]
+  }
+}
