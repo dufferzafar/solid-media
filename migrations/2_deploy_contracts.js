@@ -1,5 +1,5 @@
-var Media = artifacts.require("./Media.sol");
+var MediaMarket = artifacts.require("./MediaMarket.sol");
 
 module.exports = function(deployer) {
-  deployer.deploy(Media);
+  deployer.deploy(MediaMarket);
 };
