@@ -1,5 +1,5 @@
 
-# Readme
+# Media.sol
 
 An Ethereum smart contract for licensed media distribution. 
 
@@ -10,6 +10,21 @@ An Ethereum smart contract for licensed media distribution.
 * [Ganache](http://truffleframework.com/ganache/) to run a local Ethereum testnet.
 * [MetaMask](https://metamask.io/) as the bridge between the browser and the dapp?
 * General HTML/CSS (Bootstrap)/JS for the Web UI.
+
+## Building
+
+```bash
+git clone https://github.com/dufferzafar/solid-media
+cd solid-media
+
+make install
+
+# Run Ganache!
+
+make tmr
+
+make test
+```
 
 ## Resources
 
