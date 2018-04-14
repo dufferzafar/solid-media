@@ -1,0 +1,27 @@
+{
+  "name": "licensed-media",
+  "version": "0.0.1",
+  "description": "IIT D - COL 867 - An Ethereum smart contract for licensed media distribution. ",
+
+  "private": true,
+
+  "main": "truffle.js",
+
+  "directories": {
+    "test": "test"
+  },
+
+  "scripts": {
+    "dev": "lite-server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+
+  "author": "",
+
+  "license": "ISC",
+
+  "devDependencies": {
+    "lite-server": "^2.3.0"
+  }
+
+}
