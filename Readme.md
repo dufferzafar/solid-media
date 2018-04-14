@@ -29,3 +29,15 @@ make test
 ## Resources
 
 [Tutorial on an election app](https://www.youtube.com/watch?v=3681ZYbDSSk)
+
+[Code from the tutorial](https://github.com/dappuniversity/election)
+
+Off-chain processing:
+
+- https://medium.com/hello-sugoi/ethereum-communicating-with-the-off-chain-world-789fea13163b
+
+- [Crypto](https://github.com/pubkey/eth-crypto)
+
+- https://ethereum.stackexchange.com/questions/3092/how-to-encrypt-a-message-with-the-public-key-of-an-ethereum-address
+
+- https://ethereum.stackexchange.com/questions/15442/whats-a-recommended-way-to-pass-secret-in-solidity
