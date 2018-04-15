@@ -40,7 +40,13 @@ contract MediaMarket {
     // Will be fired when a buyer wants to buy a media
     // Will be captured by the creator who will send back an encrypted URL
     // TODO: Need to send the media, instead of media id?
+    // TODO: Add purchase ID, to uniquely identify a purchase
     event evConsumerWantsToBuy(address buyer, uint256 media_id);
+
+    // Will be fired when a creator has sent an encrypted URL
+    // Will be captured by the buery who needs this
+    // TODO: Add purchase ID, to uniquely identify a purchase
+    event evURLForMedia(address buyer, uint256 media_id, string url);
 
     /////////////////////////////////////////////////////////////////////////
 
@@ -79,6 +85,8 @@ contract MediaMarket {
     /////////////////////////////////////////////////////////////////////////
 
     // This will be called when someone wants to buy a media
+    // TODO: Receive type of consumer - Individual / Company
+    // TODO: Receive public key of consumer
     function buy_media (uint256 _media_id) public payable {
 
         // Require that they haven't already bought the same media before
@@ -96,7 +104,25 @@ contract MediaMarket {
         // TODO: Send amount to creator?
         // TODO: OR Send amounts to stakeholders?
 
-        // TODO: Emit Event (so that creator can listen to this)
         emit evConsumerWantsToBuy(msg.sender, _media_id);
     }
+
+    /////////////////////////////////////////////////////////////////////////
+
+    // This will be called when a creator wants to send an encrypted URL back to buyer
+    function url_for_media (address _buyer, uint256 _media_id, string _url) public {
+
+        // Require a valid media
+        // require(_media_id > 0 && _media_id <= media_count);
+
+        // TODO: require that this call is in response to an appropriate evConsumerWantsToBuy event!?
+        // So that not anyone can call this anytime
+
+        // require that this is only called by the creator of the media
+        // Media memory media = media_store[_media_id];
+        // require(msg.sender == media.creator);
+
+        emit evURLForMedia(_buyer, _media_id, _url);
+    }
+
 }
