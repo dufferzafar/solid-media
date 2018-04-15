@@ -64,5 +64,63 @@ contract("MediaMarket", function(accounts) {
         event.stopWatching();
     });
 
+    it("allows communication via contract", async function() {
+        // This simulates a creator
+        // who is watching for a buy event to happen
+        // and will respond with an encrypted URL
+        async function creator_ev_handler(error, event) {
+            if (!error) {
+                buyers_address = event.args.buyer;
+                media_id = event.args.media_id;
 
+                // TODO: Find public key corresponding to buyer's address
+
+                // TODO: Encrypt URL using the public key
+                encrypted_url = "http://www.google.com"
+
+                // Send the URL back to contract who will forward to buyer
+                // console.log("Sending URL to contract: " + encrypted_url);
+                await market.url_for_media(buyers_address, media_id, encrypted_url);
+
+                // FIXME: Is it wrong to put this here? Or should this be done at end?
+                buy_event.stopWatching();
+            }
+        }
+
+        buy_event = market.evConsumerWantsToBuy({}, {});
+        buy_event.watch(creator_ev_handler);
+
+        // The placement of this line signifies that:
+        // the creator, defined above, doesn't know who a particular buyer is
+        // while the buyer, defined below, knows their own address
+        buyer = accounts[2];
+
+        // This simulates a buyer
+        // who is waiting to receive an encrypted URL
+        async function buyer_ev_handler(error, event) {
+            if (!error) {
+                // If this message was meant for me
+                if (event.args.buyer == buyer) {
+
+                    // TODO: Decrypt URL using Private Key
+                    console.log("Received URL for media " + event.args.media_id +
+                                " is " + event.args.url);
+
+                    // I got what I wanted, game over!
+                    url_event.stopWatching();
+                }
+            }
+        }
+
+        url_event = market.evURLForMedia({}, {});
+        url_event.watch(buyer_ev_handler);
+
+        // These lines are also executed by a buyer
+        await market.buy_media(1, {from: buyer});
+
+        // Test that everything worked correctly
+        purchased_media = await market.purchases(buyer);
+        assert.equal(purchased_media[0], 1);
+
+    });
 });
