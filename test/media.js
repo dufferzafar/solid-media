@@ -1,3 +1,5 @@
+// const EthCrypto = require("eth-crypto");
+
 const MediaMarket = artifacts.require("./MediaMarket.sol");
 
 contract("MediaMarket", function(accounts) {
