@@ -125,4 +125,12 @@ contract("MediaMarket", function(accounts) {
         assert.equal(purchased_media[0], 1);
 
     });
+
+    // TODO: Write failure tests
+    // it("fails when wrong media is bought");
+    // it("fails when buyer has insufficient balance");
+    // it("fails when stakeholder shares don't sum up to 100");
+
+    // it("doesn't allow buying a media again");
+    // it("returns encrypted URL if media is already bought");
 });
