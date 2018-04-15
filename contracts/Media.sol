@@ -23,6 +23,10 @@ contract MediaMarket {
         // StakeHolder[] stake_holders;
     }
 
+    // Store the type of a buyer - decided once randomly!
+    // enum AccountType { Individual, Company }
+    // mapping(address => AccountType) public buyer_type;
+
     // Store accounts that have bought a media.
     // TODO: Allow people to buy more than one media
     mapping(address => Media) public purchases;
@@ -73,6 +77,14 @@ contract MediaMarket {
 
         // Record that a buyer has bought a media
         purchases[msg.sender] = media_store[_media_id];
+
+        // TODO: Deduct amount from buyer's account
+
+        // TODO: Send amount to creator?
+        // TODO: OR Send amounts to stakeholders?
+
+        // TODO: Emit Event (so that creator can listen to this)
+        // emit BuyerWantsToBuy()
 
     }
 }

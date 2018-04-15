@@ -15,12 +15,12 @@ tmr:
 	@$(BIN)/truffle migrate --reset
 
 solium:
-	@printf "$(C)Linting solidity contract with Solium$(NC)\n"
-	@$(BIN)/solium -d contracts/
+	@printf "$(C)Linting contract with Solium$(NC)\n"
+	@$(BIN)/solium --fix -d contracts/
 
 eslint:
-	@printf "$(C)Linting tests with ESLint$(NC)\n"
-	@$(BIN)/eslint test/
+	@printf "$(C)Linting tests with ESLint$(NC)\n\n"
+	@$(BIN)/eslint --fix test/
 
 lint: solium eslint
 
