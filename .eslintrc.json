@@ -1,4 +1,5 @@
 {
+    "extends": "google",
     "parserOptions": {
         "ecmaVersion": 2018
     },
@@ -6,8 +7,10 @@
         "mocha"
     ],
     "rules": {
-        "quotes": 0,
+        "indent": ["error", 4 ],
+        "linebreak-style": ["error", "unix"],
+        "quotes": ["error", "double"],
+        "semi": ["error", "always"],
         "camelcase": 0
-    },
-    "extends": "google"
+    }
 }
