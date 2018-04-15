@@ -23,23 +23,17 @@ contract("MediaMarket", function(accounts) {
     });
 
     it("lists available media", async function() {
-        observed_list = [];
-        expected_list = ["If I lose myself", "Avengers: Infinity War"];
-
         media_count = await market.media_count();
-        for (let i = 1; i <= media_count; i++) {
 
+        observed_list = [];
+        for (let i = 1; i <= media_count; i++) {
             media = await market.media_store(i)
             observed_list.push(media[1]);
-
-            // TODO: Find a way to do this outside the loop
-            // Just moving this down won't work
-            // Because the list gets created after some time
-            // and is still empty before the code reaches there
-            if (i == media_count) {
-                assert.deepEqual(observed_list, expected_list);
-            }
         }
+
+        expected_list = ["If I lose myself", "Avengers: Infinity War"];
+
+        assert.deepEqual(observed_list, expected_list);
     });
 
 });
