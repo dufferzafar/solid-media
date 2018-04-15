@@ -113,14 +113,16 @@ contract MediaMarket {
     function url_for_media (address _buyer, uint256 _media_id, string _url) public {
 
         // Require a valid media
-        // require(_media_id > 0 && _media_id <= media_count);
+        require(_media_id > 0 && _media_id <= media_count);
 
         // TODO: require that this call is in response to an appropriate evConsumerWantsToBuy event!?
         // So that not anyone can call this anytime
 
         // require that this is only called by the creator of the media
-        // Media memory media = media_store[_media_id];
-        // require(msg.sender == media.creator);
+        Media memory media = media_store[_media_id];
+        require(msg.sender == media.creator);
+
+        // TODO: Save URL into a mapping so buyer can access it later
 
         emit evURLForMedia(_buyer, _media_id, _url);
     }
