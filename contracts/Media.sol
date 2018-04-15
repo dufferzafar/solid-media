@@ -24,12 +24,11 @@ contract MediaMarket {
     }
 
     // Store accounts that have bought a media.
-    mapping(address => bool) public buyers;
+    // TODO: Allow people to buy more than one media
+    mapping(address => Media) public purchases;
 
     // Store all available media
-    mapping(uint => Media) public media_store;
-
-    // Store Media count because solidity mappings suck!
+    mapping(uint256 => Media) public media_store;
     uint public media_count;
 
     // Constructor
@@ -63,17 +62,17 @@ contract MediaMarket {
     }
 
     // This will be called when someone wants to buy a media
-    function buy (uint _media_id) public {
+    function buy_media (uint256 _media_id) public payable {
 
         // Require that they haven't already bought the same media before
-        // FIXME: Currently, this will only allow a buyer to buy once.
-        require(!buyers[msg.sender]);
+        // FIXME: Results in some struct error
+        // require(purchases[msg.sender] != media_store[_media_id]);
 
         // Require a valid media
         require(_media_id > 0 && _media_id <= media_count);
 
-        // Record that buyer has bought
-        buyers[msg.sender] = true;
+        // Record that a buyer has bought a media
+        purchases[msg.sender] = media_store[_media_id];
 
     }
 }
