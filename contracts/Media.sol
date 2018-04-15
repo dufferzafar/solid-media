@@ -2,7 +2,9 @@ pragma solidity ^0.4.2;
 
 contract MediaMarket {
 
-    // Model a Candidate
+    // NOTE: Sum of shares of each StakeHolder should sum to 1?
+    struct StakeHolder {address addr; uint256 share;}
+
     struct Media {
 
         // Unique identifier for a media
@@ -18,6 +20,7 @@ contract MediaMarket {
         uint256 cost_individual;
         uint256 cost_company;
 
+        // StakeHolder[] stake_holders;
     }
 
     // Store accounts that have bought a media.
@@ -32,8 +35,11 @@ contract MediaMarket {
     // Constructor
     function MediaMarket () public {
 
-        // TODO: Remove these later
-        add_media("If I lose myself");
+        // TODO: Make StakeHolders work
+        // StakeHolder[2] memory stake_holders = [
+        //     StakeHolder(msg.sender, 1.1),
+        //     StakeHolder(msg.sender, 2.1)
+        // ];
 
         add_media("If I lose myself", 1500, 2500);
     }
