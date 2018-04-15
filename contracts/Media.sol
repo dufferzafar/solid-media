@@ -23,6 +23,8 @@ contract MediaMarket {
         // StakeHolder[] stake_holders;
     }
 
+    /////////////////////////////////////////////////////////////////////////
+
     // Store the type of a buyer - decided once randomly!
     // enum AccountType { Individual, Company }
     // mapping(address => AccountType) public buyer_type;
@@ -35,6 +37,13 @@ contract MediaMarket {
     mapping(uint256 => Media) public media_store;
     uint public media_count;
 
+    // Will be fired when a buyer wants to buy a media
+    // Will be captured by the creator who will send back an encrypted URL
+    // TODO: Need to send the media, instead of media id?
+    event evConsumerWantsToBuy(address buyer, uint256 media_id);
+
+    /////////////////////////////////////////////////////////////////////////
+
     // Constructor
     function MediaMarket () public {
 
@@ -46,6 +55,8 @@ contract MediaMarket {
 
         add_media("If I lose myself", 1500, 2500);
     }
+
+    /////////////////////////////////////////////////////////////////////////
 
     // This will be called when someone wants to add a new media
     function add_media (
@@ -64,6 +75,8 @@ contract MediaMarket {
         );
 
     }
+
+    /////////////////////////////////////////////////////////////////////////
 
     // This will be called when someone wants to buy a media
     function buy_media (uint256 _media_id) public payable {
@@ -84,7 +97,6 @@ contract MediaMarket {
         // TODO: OR Send amounts to stakeholders?
 
         // TODO: Emit Event (so that creator can listen to this)
-        // emit BuyerWantsToBuy()
-
+        emit evConsumerWantsToBuy(msg.sender, _media_id);
     }
 }
