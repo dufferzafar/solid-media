@@ -6,6 +6,7 @@
         "mocha"
     ],
     "rules": {
+        "quotes": 0,
         "camelcase": 0
     },
     "extends": "google"
