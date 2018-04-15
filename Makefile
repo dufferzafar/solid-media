@@ -7,7 +7,7 @@ default: lint test
 
 .PHONY: test
 test: ganache
-	@printf "$(C)Running Tests$(NC)\n"
+	@printf "$(C)Running tests$(NC)\n"
 	@$(BIN)/truffle test
 
 tmr:
