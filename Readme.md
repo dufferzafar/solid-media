@@ -5,10 +5,12 @@ An Ethereum smart contract for licensed media distribution.
 
 ## Stack
 
-* [Solidity](http://solidity.readthedocs.io/en/v0.4.21/) for the core smart contract code.
-* [Truffle](https://github.com/trufflesuite/truffle) to manage the dev environment.
-* [Ganache](http://truffleframework.com/ganache/) to run a local Ethereum testnet.
+* [Solidity](http://solidity.readthedocs.io/) for the core smart contract code.
+* [Ganache](http://truffleframework.com/ganache/) to run a local Ethereum testnet. I used the GUI, but `ganache-cli` will work as well.
+* [Truffle](https://github.com/trufflesuite/truffle) to manage the dev environment - compile contract, interact with local testnet and run tests.
 * [MetaMask](https://metamask.io/) as the bridge between the browser and the dapp?
+* [Solium](https://github.com/duaraghav8/Solium) to lint the contract for style and security best practices.
+* [Mocha](https://mochajs.org/) & [Chai](http://www.chaijs.com/) for writing unit tests.
 * General HTML/CSS (Bootstrap)/JS for the Web UI.
 
 ## Building
