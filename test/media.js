@@ -35,4 +35,14 @@ contract("MediaMarket", function(accounts) {
 
         assert.deepEqual(observed_list, expected_list);
     });
+
+    it("allows buying a media", async function() {
+        buyer = accounts[0];
+
+        await market.buy_media(1, {from: buyer});
+
+        purchased_media = await market.purchases(buyer);
+
+        assert.equal(purchased_media[0], 1);
+    });
 });
