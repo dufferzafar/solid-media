@@ -42,7 +42,27 @@ contract("MediaMarket", function(accounts) {
         await market.buy_media(1, {from: buyer});
 
         purchased_media = await market.purchases(buyer);
-
         assert.equal(purchased_media[0], 1);
     });
+
+    it("triggers an event when buying", async function() {
+        buyer = accounts[1];
+
+        // Start watching for the Buy event to pop up
+        let event = market.evConsumerWantsToBuy({}, {});
+        event.watch(function(error, ev) {
+            if (!error && (ev.args.buyer == buyer)) {
+                assert.equal(ev.args.media_id, 1);
+            }
+        });
+
+        await market.buy_media(1, {from: buyer});
+
+        purchased_media = await market.purchases(buyer);
+        assert.equal(purchased_media[0], 1);
+
+        event.stopWatching();
+    });
+
+
 });
