@@ -4,8 +4,20 @@ contract MediaMarket {
 
     // Model a Candidate
     struct Media {
-        uint id;        // Unique identifier for a media
-        string name;    // Can be a song or a movie name
+
+        // Unique identifier for a media
+        uint256 id;
+
+        // Can be a song or a movie name
+        string name;
+
+        // Account adding the media
+        address creator;
+
+        // Cost of the media, for individuals or companies
+        uint256 cost_individual;
+        uint256 cost_company;
+
     }
 
     // Store accounts that have bought a media.
@@ -23,12 +35,25 @@ contract MediaMarket {
         // TODO: Remove these later
         add_media("If I lose myself");
 
+        add_media("If I lose myself", 1500, 2500);
     }
 
     // This will be called when someone wants to add a new media
-    function add_media (string _name) public {
+    function add_media (
+        string _name,
+        uint256 _cost_individual,
+        uint256 _cost_company)
+    public {
+
         media_count++;
-        media_store[media_count] = Media(media_count, _name);
+        media_store[media_count] = Media(
+            media_count,
+            _name,
+            msg.sender,
+            _cost_individual,
+            _cost_company
+        );
+
     }
 
     // This will be called when someone wants to buy a media

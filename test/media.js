@@ -11,18 +11,18 @@ contract("MediaMarket", function(accounts) {
         assert.equal(await market.media_count(), 1);
     });
 
-    it("initializes the media file with \'correct\' values", async function() {
+    it("initializes the media file with 'correct' values", async function() {
         media = await market.media_store(1);
         assert.equal(media[0], 1);
         assert.equal(media[1], "If I lose myself");
     });
 
-    it("adds a media entry", async function() {
-        await market.add_media("Avengers: Infinity War");
+    it("allows adding a media entry", async function() {
+        await market.add_media("Avengers: Infinity War", 5000, 7000);
         assert.equal(await market.media_count(), 2);
     });
 
-    it("lists available media", async function() {
+    it("allows listing available media", async function() {
         media_count = await market.media_count();
 
         observed_list = [];
