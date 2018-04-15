@@ -17,7 +17,10 @@ contract("MediaMarket", function(accounts) {
         assert.equal(media[1], "If I lose myself");
     });
 
-    // it("adds a media entry", async function() {});
+    it("adds a media entry", async function() {
+        await market.add_media("Avengers: Infinity War")
+        assert.equal(await market.media_count(), 2);
+    });
 
     it("lists available media", async function() {
         observed_list = [];
@@ -38,4 +41,5 @@ contract("MediaMarket", function(accounts) {
             }
         }
     });
+
 });

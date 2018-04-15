@@ -22,7 +22,6 @@ contract MediaMarket {
 
         // TODO: Remove these later
         add_media("If I lose myself");
-        add_media("Avengers: Infinity War");
 
     }
 
