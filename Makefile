@@ -15,6 +15,9 @@ tmr:
 lint:
 	@printf "$(C)Linting solidity contract with Solium$(NC)\n"
 	@solium -d contracts/
+eslint:
+	@printf "$(C)Linting tests with ESLint$(NC)\n"
+	@$(BIN)/eslint test/
 
 serve:
 	@printf "$(C)Running dev server$(NC)\n"
