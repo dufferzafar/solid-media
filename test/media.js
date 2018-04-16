@@ -1,4 +1,4 @@
-// const EthCrypto = require("eth-crypto");
+const EthEnc = require('ethereum-encryption');
 
 const MediaMarket = artifacts.require("./MediaMarket.sol");
 
@@ -73,6 +73,9 @@ contract("MediaMarket", function(accounts) {
         observed_url = "X";
         expected_url = "Y";
 
+        // TODO: Find a way to extract the public key from a buyer's address (using on-chain data)
+        buyers_pub_key = "03463c760cabfe2ea0529c0335656fd12b0c81fc40c478d197ae7384f197bfca1b";
+
         // This simulates a creator
         // who is watching for a buy event to happen
         // and will respond with an encrypted URL
@@ -85,16 +88,12 @@ contract("MediaMarket", function(accounts) {
                 plain_url = "http://www.google.com";
                 expected_url = plain_url;
 
-                // TODO: Find public key corresponding to buyer's address
-
-                // TODO: Encrypt URL using the public key
-                encrypted_url = plain_url;
+                encrypted_url = await EthEnc.encryptWithPublicKey(buyers_pub_key, plain_url);
 
                 // Send the URL back to contract who will forward to buyer
                 // console.log("Sending URL to contract: " + encrypted_url);
                 await market.url_for_media(buyers_address, media_id, encrypted_url);
 
-                // FIXME: Is it wrong to put this here? Or should this be done at end?
                 buy_event.stopWatching();
             }
         }
@@ -102,10 +101,13 @@ contract("MediaMarket", function(accounts) {
         buy_event = market.evConsumerWantsToBuy({}, {});
         buy_event.watch(creator_ev_handler);
 
-        // The placement of this line signifies that:
+        // The placement of these lines signifies that:
         // the creator, defined above, doesn't know who a particular buyer is
         // while the buyer, defined below, knows their own address
         buyer = accounts[2];
+
+        // Similarly, only a buyer knows their own private key
+        buyers_pvt_key = "43137cdb869f4375abfce46910aa24d528b2152c5a396158550158fbdb160b4f";
 
         // This simulates a buyer
         // who is waiting to receive an encrypted URL
@@ -114,13 +116,11 @@ contract("MediaMarket", function(accounts) {
                 // React only if this message was meant for me
                 // Other people won't be able to decrypt this message anyway
                 if (event.args.buyer == buyer) {
-                    // TODO: Decrypt URL using Private Key
-                    decrypted_url = event.args.url;
+                    decrypted_url = await EthEnc.decryptWithPrivateKey(buyers_pvt_key, event.args.url);
 
                     observed_url = decrypted_url;
 
-                    console.log("Received URL for media " + event.args.media_id +
-                                " is " + event.args.url);
+                    // console.log("Received URL for media " + event.args.media_id + " is " + decrypted_url);
 
                     assert.equal(observed_url, expected_url);
 
@@ -133,11 +133,8 @@ contract("MediaMarket", function(accounts) {
         url_event = market.evURLForMedia({}, {});
         url_event.watch(buyer_ev_handler);
 
-        // These lines are also executed by a buyer
+        // Buyer starts the game asking to buy
         await market.buy_media(1, {from: buyer});
-
-        // Test that everything worked correctly
-        purchased_media = await market.purchases(buyer);
     });
 
     // TODO: Write failure tests
