@@ -21,6 +21,10 @@ contract("MediaMarket", function(accounts) {
 
     it("allows adding a media entry", async function() {
         await market.add_media("Avengers: Infinity War", 5000, 7000);
+
+        await market.add_stakeholders(1, accounts[5], 10);
+        await market.add_stakeholders(1, accounts[6], 10);
+
         assert.equal(await market.media_count(), 2);
     });
 
@@ -41,10 +45,12 @@ contract("MediaMarket", function(accounts) {
     it("allows buying a media", async function() {
         buyer = accounts[0];
 
-        await market.buy_media(1, {from: buyer});
+        await market.buy_media(1, 1, {from: buyer});
 
         purchased_media = await market.purchases(buyer);
-        assert.equal(purchased_media[0], 1);
+
+        //console.log(purchased_media);
+        assert.equal(purchased_media[purchased_media.length-1], 1);
     });
 
     it("triggers an event when buying", async function() {
@@ -58,10 +64,10 @@ contract("MediaMarket", function(accounts) {
             }
         });
 
-        await market.buy_media(1, {from: buyer});
+        await market.buy_media(1, 1, {from: buyer});
 
         purchased_media = await market.purchases(buyer);
-        assert.equal(purchased_media[0], 1);
+        assert.equal(purchased_media[purchased_media.length - 1], 1);
 
         event.stopWatching();
     });

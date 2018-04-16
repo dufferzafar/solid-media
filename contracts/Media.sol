@@ -1,9 +1,9 @@
-pragma solidity ^0.4.2;
+pragma solidity ^0.4.21;
 
 contract MediaMarket {
 
     // NOTE: Sum of shares of each StakeHolder should sum to 1?
-    struct StakeHolder {address addr; uint256 share;}
+    //struct StakeHolder {address addr; uint256 share;}
 
     struct Media {
 
@@ -20,7 +20,10 @@ contract MediaMarket {
         uint256 cost_individual;
         uint256 cost_company;
 
-        // StakeHolder[] stake_holders;
+        address[] stake_holders;
+        uint256[] shares;
+
+        uint256 stakeholder_count;
     }
 
     /////////////////////////////////////////////////////////////////////////
@@ -31,7 +34,7 @@ contract MediaMarket {
 
     // Store accounts that have bought a media.
     // TODO: Allow people to buy more than one media
-    mapping(address => Media) public purchases;
+    mapping(address => Media[]) public purchases;
 
     // Store all available media
     mapping(uint256 => Media) public media_store;
@@ -59,7 +62,9 @@ contract MediaMarket {
         //     StakeHolder(msg.sender, 2.1)
         // ];
 
-        add_media("If I lose myself", 1500, 2500);
+        add_media("If I lose myself", 1000000000000, 2000000000000);
+        //add_stakeholders(1,0x34084959fa381774ea862266ae752253b91916dd, 10);
+        //add_stakeholders(1,0xc797dbe6389698cfb840693e62467380a5d436a6, 20);
     }
 
     /////////////////////////////////////////////////////////////////////////
@@ -71,15 +76,39 @@ contract MediaMarket {
         uint256 _cost_company)
     public {
 
+        address[] storage saddr;
+        uint256[] storage share;
+
         media_count++;
+
         media_store[media_count] = Media(
             media_count,
             _name,
             msg.sender,
             _cost_individual,
-            _cost_company
+            _cost_company,
+            //new address[](5),
+            //new uint256[](5),
+            saddr,
+            share,
+        0
         );
 
+    }
+
+    /////////////////////////////////////////////////////////////////////////
+
+    //This will add stakeholders of a media
+
+    function add_stakeholders( uint256 _media_id,address addr,uint256 share)
+    {
+        require(msg.sender == media_store[_media_id].creator);
+
+        media_store[_media_id].stakeholder_count++;
+        media_store[_media_id].stake_holders.push(addr);
+        media_store[_media_id].shares.push(share);
+        //media_store[_media_id].stake_holders[media_store[_media_id].stakeholder_count] = addr;
+        //media_store[_media_id].shares[media_store[_media_id].stakeholder_count] = share;
     }
 
     /////////////////////////////////////////////////////////////////////////
@@ -87,7 +116,7 @@ contract MediaMarket {
     // This will be called when someone wants to buy a media
     // TODO: Receive type of consumer - Individual / Company
     // TODO: Receive public key of consumer
-    function buy_media (uint256 _media_id) public payable {
+    function buy_media (uint256 _media_id,uint customer_type) public payable {
 
         // Require that they haven't already bought the same media before
         // FIXME: Results in some struct error
@@ -96,8 +125,27 @@ contract MediaMarket {
         // Require a valid media
         require(_media_id > 0 && _media_id <= media_count);
 
+        // Check and Deduct cost
+        uint256 cost = media_store[_media_id].cost_company;
+        if (customer_type == 0)
+            cost = media_store[_media_id].cost_individual;
+
+        uint256 balance = msg.sender.balance;
+
+        // Require that consumer has sufficient balance
+        require(balance >= cost);
+
+        uint256 total = 0;
+        for (uint i = 0;i<media_store[_media_id].stake_holders.length;i++)
+            uint256 share_value = (media_store[_media_id].shares[i]*cost) / 100;
+            media_store[_media_id].stake_holders[i].send(share_value);
+            total += share_value;
+
+        uint256 remainder = cost - total;
+        media_store[_media_id].creator.send(remainder);
+
         // Record that a buyer has bought a media
-        purchases[msg.sender] = media_store[_media_id];
+        purchases[msg.sender].push(media_store[_media_id]);
 
         // TODO: Deduct amount from buyer's account
 
