@@ -100,8 +100,7 @@ contract MediaMarket {
 
     //This will add stakeholders of a media
 
-    function add_stakeholders( uint256 _media_id,address addr,uint256 share)
-    {
+    function add_stakeholders( uint256 _media_id, address addr, uint256 share) public {
         require(msg.sender == media_store[_media_id].creator);
 
         media_store[_media_id].stakeholder_count++;
@@ -116,7 +115,7 @@ contract MediaMarket {
     // This will be called when someone wants to buy a media
     // TODO: Receive type of consumer - Individual / Company
     // TODO: Receive public key of consumer
-    function buy_media (uint256 _media_id,uint customer_type) public payable {
+    function buy_media (uint256 _media_id, uint _customer_type) public payable {
 
         // Require that they haven't already bought the same media before
         // FIXME: Results in some struct error
@@ -127,7 +126,7 @@ contract MediaMarket {
 
         // Check and Deduct cost
         uint256 cost = media_store[_media_id].cost_company;
-        if (customer_type == 0)
+        if (_customer_type == 0)
             cost = media_store[_media_id].cost_individual;
 
         uint256 balance = msg.sender.balance;
@@ -135,14 +134,14 @@ contract MediaMarket {
         // Require that consumer has sufficient balance
         require(balance >= cost);
 
-        uint256 total = 0;
-        for (uint i = 0;i<media_store[_media_id].stake_holders.length;i++)
-            uint256 share_value = (media_store[_media_id].shares[i]*cost) / 100;
-            media_store[_media_id].stake_holders[i].send(share_value);
-            total += share_value;
+        // uint256 total = 0;
+        // for (uint i = 0; i < media_store[_media_id].stake_holders.length; i++)
+        //     uint256 share_value = (media_store[_media_id].shares[i]*cost) / 100;
+        //     media_store[_media_id].stake_holders[i].transfer(share_value);
+        //     total += share_value;
 
-        uint256 remainder = cost - total;
-        media_store[_media_id].creator.send(remainder);
+        // uint256 remainder = cost - total;
+        // media_store[_media_id].creator.transfer(remainder);
 
         // Record that a buyer has bought a media
         purchases[msg.sender].push(media_store[_media_id]);
