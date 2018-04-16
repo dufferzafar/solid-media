@@ -67,6 +67,12 @@ contract("MediaMarket", function(accounts) {
     });
 
     it("allows communication via contract", async function() {
+        // These values will be filled by the creator/buyer
+        // Initial values should be different!
+        // so we can show that everything is working correctly.
+        observed_url = "X";
+        expected_url = "Y";
+
         // This simulates a creator
         // who is watching for a buy event to happen
         // and will respond with an encrypted URL
@@ -75,10 +81,14 @@ contract("MediaMarket", function(accounts) {
                 buyers_address = event.args.buyer;
                 media_id = event.args.media_id;
 
+                // TODO: A dict of URLs for other media ?!
+                plain_url = "http://www.google.com";
+                expected_url = plain_url;
+
                 // TODO: Find public key corresponding to buyer's address
 
                 // TODO: Encrypt URL using the public key
-                encrypted_url = "http://www.google.com"
+                encrypted_url = plain_url;
 
                 // Send the URL back to contract who will forward to buyer
                 // console.log("Sending URL to contract: " + encrypted_url);
@@ -101,12 +111,18 @@ contract("MediaMarket", function(accounts) {
         // who is waiting to receive an encrypted URL
         async function buyer_ev_handler(error, event) {
             if (!error) {
-                // If this message was meant for me
+                // React only if this message was meant for me
+                // Other people won't be able to decrypt this message anyway
                 if (event.args.buyer == buyer) {
-
                     // TODO: Decrypt URL using Private Key
+                    decrypted_url = event.args.url;
+
+                    observed_url = decrypted_url;
+
                     console.log("Received URL for media " + event.args.media_id +
                                 " is " + event.args.url);
+
+                    assert.equal(observed_url, expected_url);
 
                     // I got what I wanted, game over!
                     url_event.stopWatching();
@@ -122,8 +138,6 @@ contract("MediaMarket", function(accounts) {
 
         // Test that everything worked correctly
         purchased_media = await market.purchases(buyer);
-        assert.equal(purchased_media[0], 1);
-
     });
 
     // TODO: Write failure tests
@@ -133,4 +147,9 @@ contract("MediaMarket", function(accounts) {
 
     // it("doesn't allow buying a media again");
     // it("returns encrypted URL if media is already bought");
+
+    // it("deducts the right cost for individual")
+    // it("deducts the right cost for company")
+
+
 });
