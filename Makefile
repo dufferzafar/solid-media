@@ -34,4 +34,4 @@ install:
 
 .PHONY: ganache
 ganache:
-	@if ! pgrep ganache >/dev/null 2>&1; then printf "$(C)Ganache not running!$(NC)\n"; fi;
+	@if ! pgrep ganache >/dev/null 2>&1; then printf "$(C)Ganache not running!$(NC)\n"; exit 1; fi;
