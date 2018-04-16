@@ -23,6 +23,8 @@
     "truffle": "^4.1.5"
   },
   "dependencies": {
-    "eth-crypto": "^1.0.0"
+    "ethereumjs-util": "^5.1.5",
+    "eth-crypto": "^1.0.0",
+    "ethereum-encryption": "0.0.5"
   }
 }

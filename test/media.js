@@ -1,4 +1,4 @@
-const EthEnc = require('ethereum-encryption');
+const EthEnc = require("ethereum-encryption");
 
 const MediaMarket = artifacts.require("./MediaMarket.sol");
 
