@@ -54,6 +54,14 @@ contract("MediaMarket", function(accounts) {
         assert.equal(media[5], 0);
     });
 
+    it("fails when someone else tries to add a stakeholder", async function() {
+        try { // The creator of Media 1 is accounts[3]
+            await market.add_stakeholder(1, accounts[4], 5);
+        } catch (e) {
+            assert(e.message.endsWith("revert"));
+        }
+    });
+
     it("allows adding stakeholders dynamically", async function() {
         media_id = 2;
 
