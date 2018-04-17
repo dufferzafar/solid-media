@@ -153,6 +153,31 @@ contract("MediaMarket", function(accounts) {
         await market.buy_media(1, INDIVIDUAL, {from: buyer, value: 1000 * finney});
     });
 
+    it("pays the creator when buying", async function() {
+        // Details of the media being bought
+        media_id = 1;
+        media = await market.media_store(media_id);
+        media_cost = media[3].toNumber();
+        media_creator = media[2];
+
+        // Find balance of creator, before
+        cbal_before = web3.eth.getBalance(media_creator).toNumber();
+
+        await market.buy_media(
+            media_id, INDIVIDUAL, {from: accounts[4], value: media_cost}
+        );
+
+        // Find balance of creator, after
+        cbal_after = web3.eth.getBalance(media_creator).toNumber();
+
+        // The entire cost must go to the creator as media 1 has no stakeholders
+        assert.equal(cbal_after, cbal_before + media_cost);
+
+        // The same test wouldn't work for buyer since
+        // we're executing a transaction from him
+        // and also need to account for the Gas used.
+    });
+
     it("allows communication via contract", async function() {
         // These values will be filled by the creator/buyer
         // Initial values should be different!

@@ -102,7 +102,7 @@ contract MediaMarket {
         require(msg.value == cost);
 
         // TODO: Send amounts to stakeholders depending on their shares
-        // uint256 stakeholders_total = 0;
+        uint256 stakeholders_total = 0;
         // for (uint i = 1; i <= M.stakeholder_count; i++) {
 
         //     StakeHolder memory S =  media_store[_media_id].stakeholders[i];
@@ -115,7 +115,7 @@ contract MediaMarket {
         // }
 
         // TODO: Send remaining amount to creator
-        // M.creator.transfer(cost - stakeholders_total);
+        M.creator.transfer(cost - stakeholders_total);
 
         // Record that a buyer has bought a media
         purchases[msg.sender].push(M);
