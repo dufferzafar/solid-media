@@ -22,7 +22,6 @@ contract("MediaMarket", function(accounts) {
     });
 
     it("allows adding media entries", async function() {
-        // TODO: Should the cost be exactly in Ether?
         await market.add_media(
             "If I lose myself", 1 * finney, 2 * finney, {from: accounts[3]}
         );

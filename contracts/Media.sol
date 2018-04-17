@@ -26,7 +26,6 @@ contract MediaMarket {
     /////////////////////////////////////////////////////////////////////////
 
     // Store accounts that have bought a media.
-    // TODO: Allow people to buy more than one media
     mapping(address => Media[]) public purchases;
 
     // Store all available media
@@ -35,7 +34,6 @@ contract MediaMarket {
 
     // Will be fired when a buyer wants to buy a media
     // Will be captured by the creator who will send back an encrypted URL
-    // TODO: Need to send the media, instead of media id?
     // TODO: Add purchase ID, to uniquely identify a purchase
     event evConsumerWantsToBuy(address buyer, uint256 media_id);
 
@@ -51,8 +49,6 @@ contract MediaMarket {
         media_count++;
         media_store[media_count] = Media(media_count, _name, msg.sender, _cost_individual, _cost_company, 0);
     }
-
-    // TODO: Function to get all media?
 
     /////////////////////////////////////////////////////////////////////////
 
@@ -87,8 +83,7 @@ contract MediaMarket {
     // This will be called when someone wants to buy a media
     function buy_media (uint256 _media_id, uint _customer_type) public payable {
 
-        // Require that they haven't already bought the same media before
-        // FIXME: Results in some struct error
+        // TODO: Require that they haven't already bought the same media before
         // require(purchases[msg.sender] != media_store[_media_id]);
 
         // Require a valid media
@@ -104,10 +99,7 @@ contract MediaMarket {
         // Require that consumer has sufficient balance
         // require(msg.sender.balance >= cost);
 
-        // TODO: Only except exact amount?
         require(msg.value == cost);
-
-        // TODO: Deduct amount from buyer's account
 
         // TODO: Send amounts to stakeholders depending on their shares
         // uint256 stakeholders_total = 0;
