@@ -2,7 +2,6 @@ pragma solidity ^0.4.21;
 
 contract MediaMarket {
 
-    // NOTE: Sum of shares of each StakeHolder should sum to 100?
     struct StakeHolder {address addr; uint256 share;}
 
     struct Media {
@@ -73,24 +72,31 @@ contract MediaMarket {
         media_store[media_count] = Media(media_count, _name, msg.sender, _cost_individual, _cost_company, 0);
     }
 
+    // TODO: Function to get all media?
+
     /////////////////////////////////////////////////////////////////////////
 
     // This will be called by the creator to add stakeholders of a media
-    // TODO:
     function add_stakeholder(uint256 _media_id, address _addr, uint256 _share) public {
+
+        // TODO: Require that stakeholders have different addresses?
+        // TODO: Require that sum of shares of each StakeHolder should be < 100?
+
         // Only a media creator should be able to add stakeholders
         require(msg.sender == media_store[_media_id].creator);
 
-        // TODO: Stakeholder count < 5?
+        // A media may have a maximum of 5 stakeholders
+        require(media_store[_media_id].stakeholder_count < 5);
 
         media_store[_media_id].stakeholder_count++;
         media_store[_media_id].holders[media_store[_media_id].stakeholder_count] = StakeHolder(_addr, _share);
+
     }
 
     function get_stakeholder(uint256 _media_id, uint256 _idx) public constant returns (address, uint256) {
 
         // TODO: Check off by 1
-        // require(_idx <= media_store[_media_id].stakeholder_count);
+        require(_idx > 0 && _idx <= media_store[_media_id].stakeholder_count);
 
         StakeHolder memory S = media_store[_media_id].holders[_idx];
         return (S.addr, S.share);

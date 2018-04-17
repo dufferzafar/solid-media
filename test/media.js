@@ -19,7 +19,7 @@ contract("MediaMarket", function(accounts) {
         assert.equal(media[1], "If I lose myself");
     });
 
-    it.only("allows adding a media entry", async function() {
+    it("allows adding a media entry", async function() {
         await market.add_media("Avengers: Infinity War", 5000, 7000);
         assert.equal(await market.media_count(), 2);
     });
@@ -33,13 +33,13 @@ contract("MediaMarket", function(accounts) {
     it("allows adding stakeholders dynamically", async function() {
         media_id = 2;
 
-        // Add two stakeholders
+        // Add 2 stakeholders
         await market.add_stakeholder(media_id, accounts[5], 25);
         await market.add_stakeholder(media_id, accounts[6], 15);
 
         // Check proper count
         media = await market.media_store(media_id);
-        assert.equal(media[5], 2, "has two stakeholders");
+        assert.equal(media[5], 2, "has 2 stakeholders");
 
         // Check proper stakeholders
         stake = await market.get_stakeholder(media_id, 1);
@@ -49,6 +49,32 @@ contract("MediaMarket", function(accounts) {
         stake = await market.get_stakeholder(media_id, 2);
         assert.equal(stake[0], accounts[6]);
         assert.equal(stake[1], 15);
+    });
+
+    it("allows upto 5 stakeholders", async function() {
+        media_id = 2;
+
+        // Add three more stakeholders
+        await market.add_stakeholder(media_id, accounts[7], 5);
+        await market.add_stakeholder(media_id, accounts[8], 5);
+        await market.add_stakeholder(media_id, accounts[9], 5);
+
+        media = await market.media_store(media_id);
+        assert.equal(media[5], 5, "has 5 stakeholders");
+    });
+
+    it("fails when adding more than 5 stakeholders", async function() {
+        media_id = 2;
+
+        // Try adding 1 more stakeholder; should fail!
+        try {
+            await market.add_stakeholder(media_id, accounts[4], 5);
+        } catch (e) {
+            assert(e.message.endsWith("revert"));
+        }
+
+        media = await market.media_store(media_id);
+        assert.equal(media[5], 5, "still has 5 stakeholders");
     });
 
     it("allows listing available media", async function() {
