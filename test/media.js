@@ -17,19 +17,35 @@ contract("MediaMarket", function(accounts) {
         market = await MediaMarket.deployed();
     });
 
-    it("initializes with one media file", async function() {
-        assert.equal(await market.media_count(), 1);
+    it("initializes with no media files", async function() {
+        assert.equal(await market.media_count(), 0);
     });
 
-    it("initializes the media file with 'correct' values", async function() {
-        media = await market.media_store(1);
-        assert.equal(media[0], 1);
-        assert.equal(media[1], "If I lose myself");
-    });
+    it("allows adding media entries", async function() {
+        // TODO: Should the cost be exactly in Ether?
+        await market.add_media(
+            "If I lose myself", 1 * finney, 2 * finney, {from: accounts[3]}
+        );
 
-    it("allows adding a media entry", async function() {
-        await market.add_media("Avengers: Infinity War", 5000, 7000);
+        await market.add_media(
+            "Avengers: Infinity War", 50 * finney, 70 * finney, {from: accounts[4]}
+        );
+
         assert.equal(await market.media_count(), 2);
+    });
+
+    it("allows listing available media", async function() {
+        media_count = await market.media_count();
+
+        observed_list = [];
+        for (let i = 1; i <= media_count; i++) {
+            media = await market.media_store(i);
+            observed_list.push(media[1]);
+        }
+
+        expected_list = ["If I lose myself", "Avengers: Infinity War"];
+
+        assert.deepEqual(observed_list, expected_list);
     });
 
     it("initializes with 0 stakeholders", async function() {
@@ -83,20 +99,6 @@ contract("MediaMarket", function(accounts) {
 
         media = await market.media_store(media_id);
         assert.equal(media[5], 5, "still has 5 stakeholders");
-    });
-
-    it("allows listing available media", async function() {
-        media_count = await market.media_count();
-
-        observed_list = [];
-        for (let i = 1; i <= media_count; i++) {
-            media = await market.media_store(i);
-            observed_list.push(media[1]);
-        }
-
-        expected_list = ["If I lose myself", "Avengers: Infinity War"];
-
-        assert.deepEqual(observed_list, expected_list);
     });
 
     it("allows buying a media", async function() {
