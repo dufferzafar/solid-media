@@ -2,7 +2,7 @@ pragma solidity ^0.4.21;
 
 contract MediaMarket {
 
-    // NOTE: Sum of shares of each StakeHolder should sum to 1?
+    // NOTE: Sum of shares of each StakeHolder should sum to 100?
     struct StakeHolder {address addr; uint256 share;}
 
     struct Media {
@@ -61,44 +61,30 @@ contract MediaMarket {
         // ];
 
         add_media("If I lose myself", 1000000000000, 2000000000000);
-        add_stakeholders(1,0x34084959fa381774ea862266ae752253b91916dd, 10);
-        add_stakeholders(1,0xc797dbe6389698cfb840693e62467380a5d436a6, 20);
+        // add_stakeholders(1,0x34084959fa381774ea862266ae752253b91916dd, 10);
+        // add_stakeholders(1,0xc797dbe6389698cfb840693e62467380a5d436a6, 20);
     }
 
     /////////////////////////////////////////////////////////////////////////
 
     // This will be called when someone wants to add a new media
-    function add_media (
-        string _name,
-        uint256 _cost_individual,
-        uint256 _cost_company)
-    public {
-
-        address[] storage saddr;
-        uint256[] storage share;
-
+    function add_media (string _name, uint256 _cost_individual, uint256 _cost_company) public {
         media_count++;
-
-        media_store[media_count] = Media(
-            media_count,
-            _name,
-            msg.sender,
-            _cost_individual,
-            _cost_company,
-            0
-        );
-
+        media_store[media_count] = Media(media_count, _name, msg.sender, _cost_individual, _cost_company, 0);
     }
 
     /////////////////////////////////////////////////////////////////////////
 
-    //This will add stakeholders of a media
-
-    function add_stakeholders( uint256 _media_id, address addr, uint256 share) public {
+    // This will be called by the creator to add stakeholders of a media
+    // TODO:
+    function add_stakeholder(uint256 _media_id, address _addr, uint256 _share) public {
+        // Only a media creator should be able to add stakeholders
         require(msg.sender == media_store[_media_id].creator);
 
+        // TODO: Stakeholder count < 5?
+
         media_store[_media_id].stakeholder_count++;
-        media_store[_media_id].holders[media_store[_media_id].stakeholder_count] = StakeHolder(addr,share);
+        media_store[_media_id].holders[media_store[_media_id].stakeholder_count] = StakeHolder(_addr, _share);
     }
 
     /////////////////////////////////////////////////////////////////////////

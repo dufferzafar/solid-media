@@ -22,8 +22,8 @@ contract("MediaMarket", function(accounts) {
     it("allows adding a media entry", async function() {
         await market.add_media("Avengers: Infinity War", 5000, 7000);
 
-        await market.add_stakeholders(1, accounts[5], 10);
-        await market.add_stakeholders(1, accounts[6], 10);
+        await market.add_stakeholder(1, accounts[5], 10);
+        await market.add_stakeholder(1, accounts[6], 10);
 
         assert.equal(await market.media_count(), 2);
     });
@@ -34,7 +34,7 @@ contract("MediaMarket", function(accounts) {
         observed_list = [];
         for (let i = 1; i <= media_count; i++) {
             media = await market.media_store(i);
-	    //console.log(media);
+            // console.log(media);
             observed_list.push(media[1]);
         }
 
@@ -49,7 +49,7 @@ contract("MediaMarket", function(accounts) {
         await market.buy_media(1, 1, {from: buyer});
 
         purchased_media = await market.purchases(buyer, 0);
-	//console.log(purchased_media[4]);
+        // console.log(purchased_media[4]);
         assert.equal(purchased_media[0], 1);
     });
 
@@ -153,6 +153,4 @@ contract("MediaMarket", function(accounts) {
 
     // it("deducts the right cost for individual")
     // it("deducts the right cost for company")
-
-
 });
