@@ -23,7 +23,7 @@ contract("MediaMarket", function(accounts) {
 
     it("allows adding media entries", async function() {
         await market.add_media(
-            "If I lose myself", 1 * finney, 2 * finney, {from: accounts[3]}
+            "If I lose myself", 1000 * finney, 2000 * finney, {from: accounts[3]}
         );
 
         await market.add_media(
@@ -150,7 +150,7 @@ contract("MediaMarket", function(accounts) {
         });
 
         // Find proper costs of the media
-        await market.buy_media(1, INDIVIDUAL, {from: buyer, value: 1 * finney});
+        await market.buy_media(1, INDIVIDUAL, {from: buyer, value: 1000 * finney});
     });
 
     it("allows communication via contract", async function() {
@@ -229,7 +229,7 @@ contract("MediaMarket", function(accounts) {
         // media = await market.media_store(media_id);
         // media_cost = media[3];
 
-        await market.buy_media(media_id, INDIVIDUAL, {from: buyer, value: 1 * finney});
+        await market.buy_media(media_id, INDIVIDUAL, {from: buyer, value: 1000 * finney});
     });
 
     // TODO: Write failure tests
