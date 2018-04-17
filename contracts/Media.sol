@@ -46,14 +46,6 @@ contract MediaMarket {
 
     /////////////////////////////////////////////////////////////////////////
 
-    // Constructor
-    function MediaMarket () public {
-        // TODO: Should the cost be exactly in Ether?
-        add_media("If I lose myself", 1 finney, 2 finney);
-    }
-
-    /////////////////////////////////////////////////////////////////////////
-
     // This will be called when someone wants to add a new media
     function add_media (string _name, uint256 _cost_individual, uint256 _cost_company) public {
         media_count++;
@@ -93,7 +85,6 @@ contract MediaMarket {
     /////////////////////////////////////////////////////////////////////////
 
     // This will be called when someone wants to buy a media
-    // TODO: Receive public key of consumer
     function buy_media (uint256 _media_id, uint _customer_type) public payable {
 
         // Require that they haven't already bought the same media before
