@@ -49,7 +49,7 @@ contract("MediaMarket", function(accounts) {
     });
 
     it("initializes with 0 stakeholders", async function() {
-        media_id = 1
+        media_id = 1;
         media = await market.media_store(media_id);
         assert.equal(media[5], 0);
     });
@@ -58,8 +58,13 @@ contract("MediaMarket", function(accounts) {
         media_id = 2;
 
         // Add 2 stakeholders
-        await market.add_stakeholder(media_id, accounts[5], 25);
-        await market.add_stakeholder(media_id, accounts[6], 15);
+        await market.add_stakeholder(
+            media_id, accounts[5], 25, {from: accounts[4]}
+        );
+
+        await market.add_stakeholder(
+            media_id, accounts[6], 15, {from: accounts[4]}
+        );
 
         // Check proper count
         media = await market.media_store(media_id);
@@ -79,9 +84,15 @@ contract("MediaMarket", function(accounts) {
         media_id = 2;
 
         // Add three more stakeholders
-        await market.add_stakeholder(media_id, accounts[7], 5);
-        await market.add_stakeholder(media_id, accounts[8], 5);
-        await market.add_stakeholder(media_id, accounts[9], 5);
+        await market.add_stakeholder(
+            media_id, accounts[7], 5, {from: accounts[4]}
+        );
+        await market.add_stakeholder(
+            media_id, accounts[8], 5, {from: accounts[4]}
+        );
+        await market.add_stakeholder(
+            media_id, accounts[9], 5, {from: accounts[4]}
+        );
 
         media = await market.media_store(media_id);
         assert.equal(media[5], 5, "has 5 stakeholders");
@@ -92,7 +103,9 @@ contract("MediaMarket", function(accounts) {
 
         // Try adding 1 more stakeholder; should fail!
         try {
-            await market.add_stakeholder(media_id, accounts[4], 5);
+            await market.add_stakeholder(
+                media_id, accounts[4], 5, {from: accounts[4]}
+            );
         } catch (e) {
             assert(e.message.endsWith("revert"));
         }
@@ -107,7 +120,7 @@ contract("MediaMarket", function(accounts) {
 
         // Find proper costs of the media
         media = await market.media_store(media_id);
-        media_cost = media[4];
+        media_cost = media[3];
 
         // Buy it
         await market.buy_media(media_id, INDIVIDUAL, {from: buyer, value: media_cost});
@@ -140,6 +153,9 @@ contract("MediaMarket", function(accounts) {
         observed_url = "X";
         expected_url = "Y";
 
+        // We'll try things out with media 1
+        media_id = 1;
+
         // TODO: Find a way to extract the public key from a buyer's address (using on-chain data)
         buyers_pub_key = "03463c760cabfe2ea0529c0335656fd12b0c81fc40c478d197ae7384f197bfca1b";
 
@@ -149,7 +165,6 @@ contract("MediaMarket", function(accounts) {
         async function creator_ev_handler(error, event) {
             if (!error) {
                 buyers_address = event.args.buyer;
-                media_id = event.args.media_id;
 
                 // TODO: A dict of URLs for other media ?!
                 plain_url = "http://www.google.com";
@@ -159,7 +174,10 @@ contract("MediaMarket", function(accounts) {
 
                 // Send the URL back to contract who will forward to buyer
                 // console.log("Sending URL to contract: " + encrypted_url);
-                await market.url_for_media(buyers_address, media_id, encrypted_url);
+                // TODO: Add failure test for creator?
+                await market.url_for_media(
+                    buyers_address, media_id, encrypted_url, {from: accounts[3]}
+                );
 
                 buy_event.stopWatching();
             }
@@ -201,10 +219,10 @@ contract("MediaMarket", function(accounts) {
         url_event.watch(buyer_ev_handler);
 
         // FIXME: Enabling these lines prevents buyer_ev_handler from ending
-        // media = await market.media_store(1);
-        // media_cost = media[4];
+        // media = await market.media_store(media_id);
+        // media_cost = media[3];
 
-        await market.buy_media(1, INDIVIDUAL, {from: buyer, value: 1 * finney});
+        await market.buy_media(media_id, INDIVIDUAL, {from: buyer, value: 1 * finney});
     });
 
     // TODO: Write failure tests
