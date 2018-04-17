@@ -198,8 +198,11 @@ contract("MediaMarket", function(accounts) {
         url_event = market.evURLForMedia({}, {});
         url_event.watch(buyer_ev_handler);
 
-        // Buyer starts the game asking to buy
-        await market.buy_media(1, 1, {from: buyer, value: 1000000000000});
+        // FIXME: Enabling these lines prevents buyer_ev_handler from ending
+        // media = await market.media_store(1);
+        // media_cost = media[4];
+
+        await market.buy_media(1, INDIVIDUAL, {from: buyer, value: 1 * finney});
     });
 
     // TODO: Write failure tests
