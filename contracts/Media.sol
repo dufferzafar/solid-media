@@ -19,7 +19,7 @@ contract MediaMarket {
         uint256 cost_individual;
         uint256 cost_company;
 
-        mapping(uint256 => StakeHolder) holders;
+        mapping(uint256 => StakeHolder) stakeholders;
         uint stakeholder_count;
     }
 
@@ -76,16 +76,16 @@ contract MediaMarket {
         require(media_store[_media_id].stakeholder_count < 5);
 
         media_store[_media_id].stakeholder_count++;
-        media_store[_media_id].holders[media_store[_media_id].stakeholder_count] = StakeHolder(_addr, _share);
+        media_store[_media_id].stakeholders[media_store[_media_id].stakeholder_count] = StakeHolder(_addr, _share);
 
     }
 
     function get_stakeholder(uint256 _media_id, uint256 _idx) public constant returns (address, uint256) {
 
-        // TODO: Check off by 1
+        // Require a valid stakeholder
         require(_idx > 0 && _idx <= media_store[_media_id].stakeholder_count);
 
-        StakeHolder memory S = media_store[_media_id].holders[_idx];
+        StakeHolder memory S = media_store[_media_id].stakeholders[_idx];
         return (S.addr, S.share);
     }
 
