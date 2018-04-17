@@ -2,6 +2,14 @@ const EthEnc = require("ethereum-encryption");
 
 const MediaMarket = artifacts.require("./MediaMarket.sol");
 
+// Ethereum Units
+const finney = Math.pow(10, 15);
+const ether = Math.pow(10, 18);
+
+// Type of consumer
+const INDIVIDUAL = 0;
+const COMPANY = 1;
+
 contract("MediaMarket", function(accounts) {
     let market; // Will store an instance of our contract
 
@@ -92,12 +100,19 @@ contract("MediaMarket", function(accounts) {
     });
 
     it("allows buying a media", async function() {
+        media_id = 1;
         buyer = accounts[0];
 
-        await market.buy_media(1, 1, {from: buyer, value: 1000000000000});
+        // Find proper costs of the media
+        media = await market.media_store(media_id);
+        media_cost = media[4];
 
+        // Buy it
+        await market.buy_media(media_id, INDIVIDUAL, {from: buyer, value: media_cost});
+
+        // Ensure that it was bought
         purchased_media = await market.purchases(buyer, 0);
-        assert.equal(purchased_media[0], 1);
+        assert.equal(purchased_media[0], media_id);
     });
 
     it("triggers an event when buying", async function() {
@@ -108,15 +123,12 @@ contract("MediaMarket", function(accounts) {
         event.watch(function(error, ev) {
             if (!error && (ev.args.buyer == buyer)) {
                 assert.equal(ev.args.media_id, 1);
+                event.stopWatching();
             }
         });
 
-        await market.buy_media(1, 1, {from: buyer, value: 1000000000000});
-
-        purchased_media = await market.purchases(buyer, 0);
-        assert.equal(purchased_media[0], 1);
-
-        event.stopWatching();
+        // Find proper costs of the media
+        await market.buy_media(1, INDIVIDUAL, {from: buyer, value: 1 * finney});
     });
 
     it("allows communication via contract", async function() {
