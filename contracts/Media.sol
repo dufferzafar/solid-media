@@ -87,6 +87,15 @@ contract MediaMarket {
         media_store[_media_id].holders[media_store[_media_id].stakeholder_count] = StakeHolder(_addr, _share);
     }
 
+    function get_stakeholder(uint256 _media_id, uint256 _idx) public constant returns (address, uint256) {
+
+        // TODO: Check off by 1
+        // require(_idx <= media_store[_media_id].stakeholder_count);
+
+        StakeHolder memory S = media_store[_media_id].holders[_idx];
+        return (S.addr, S.share);
+    }
+
     /////////////////////////////////////////////////////////////////////////
 
     // This will be called when someone wants to buy a media
