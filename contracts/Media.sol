@@ -3,7 +3,7 @@ pragma solidity ^0.4.21;
 contract MediaMarket {
 
     // NOTE: Sum of shares of each StakeHolder should sum to 1?
-    //struct StakeHolder {address addr; uint256 share;}
+    struct StakeHolder {address addr; uint256 share;}
 
     struct Media {
 
@@ -20,10 +20,8 @@ contract MediaMarket {
         uint256 cost_individual;
         uint256 cost_company;
 
-        address[] stake_holders;
-        uint256[] shares;
-
-        uint256 stakeholder_count;
+        mapping(uint256 => StakeHolder) holders;
+        uint stakeholder_count;
     }
 
     /////////////////////////////////////////////////////////////////////////
@@ -63,8 +61,8 @@ contract MediaMarket {
         // ];
 
         add_media("If I lose myself", 1000000000000, 2000000000000);
-        //add_stakeholders(1,0x34084959fa381774ea862266ae752253b91916dd, 10);
-        //add_stakeholders(1,0xc797dbe6389698cfb840693e62467380a5d436a6, 20);
+        add_stakeholders(1,0x34084959fa381774ea862266ae752253b91916dd, 10);
+        add_stakeholders(1,0xc797dbe6389698cfb840693e62467380a5d436a6, 20);
     }
 
     /////////////////////////////////////////////////////////////////////////
@@ -87,11 +85,7 @@ contract MediaMarket {
             msg.sender,
             _cost_individual,
             _cost_company,
-            //new address[](5),
-            //new uint256[](5),
-            saddr,
-            share,
-        0
+            0
         );
 
     }
@@ -104,10 +98,7 @@ contract MediaMarket {
         require(msg.sender == media_store[_media_id].creator);
 
         media_store[_media_id].stakeholder_count++;
-        media_store[_media_id].stake_holders.push(addr);
-        media_store[_media_id].shares.push(share);
-        //media_store[_media_id].stake_holders[media_store[_media_id].stakeholder_count] = addr;
-        //media_store[_media_id].shares[media_store[_media_id].stakeholder_count] = share;
+        media_store[_media_id].holders[media_store[_media_id].stakeholder_count] = StakeHolder(addr,share);
     }
 
     /////////////////////////////////////////////////////////////////////////
