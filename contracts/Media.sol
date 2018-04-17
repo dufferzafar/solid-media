@@ -25,10 +25,6 @@ contract MediaMarket {
 
     /////////////////////////////////////////////////////////////////////////
 
-    // Store the type of a buyer - decided once randomly!
-    // enum AccountType { Individual, Company }
-    // mapping(address => AccountType) public buyer_type;
-
     // Store accounts that have bought a media.
     // TODO: Allow people to buy more than one media
     mapping(address => Media[]) public purchases;
@@ -52,16 +48,7 @@ contract MediaMarket {
 
     // Constructor
     function MediaMarket () public {
-
-        // TODO: Make StakeHolders work
-        // StakeHolder[2] memory stake_holders = [
-        //     StakeHolder(msg.sender, 1.1),
-        //     StakeHolder(msg.sender, 2.1)
-        // ];
-
-        add_media("If I lose myself", 1000000000000, 2000000000000);
-        // add_stakeholders(1,0x34084959fa381774ea862266ae752253b91916dd, 10);
-        // add_stakeholders(1,0xc797dbe6389698cfb840693e62467380a5d436a6, 20);
+        add_media("If I lose myself", 10000000000, 20000000000);
     }
 
     /////////////////////////////////////////////////////////////////////////
@@ -105,7 +92,6 @@ contract MediaMarket {
     /////////////////////////////////////////////////////////////////////////
 
     // This will be called when someone wants to buy a media
-    // TODO: Receive type of consumer - Individual / Company
     // TODO: Receive public key of consumer
     function buy_media (uint256 _media_id, uint _customer_type) public payable {
 
