@@ -94,7 +94,7 @@ contract("MediaMarket", function(accounts) {
     it("allows buying a media", async function() {
         buyer = accounts[0];
 
-        await market.buy_media(1, 1, {from: buyer});
+        await market.buy_media(1, 1, {from: buyer, value: 1000000000000});
 
         purchased_media = await market.purchases(buyer, 0);
         assert.equal(purchased_media[0], 1);
@@ -111,7 +111,7 @@ contract("MediaMarket", function(accounts) {
             }
         });
 
-        await market.buy_media(1, 1, {from: buyer});
+        await market.buy_media(1, 1, {from: buyer, value: 1000000000000});
 
         purchased_media = await market.purchases(buyer, 0);
         assert.equal(purchased_media[0], 1);
@@ -187,7 +187,7 @@ contract("MediaMarket", function(accounts) {
         url_event.watch(buyer_ev_handler);
 
         // Buyer starts the game asking to buy
-        await market.buy_media(1, 1, {from: buyer});
+        await market.buy_media(1, 1, {from: buyer, value: 1000000000000});
     });
 
     // TODO: Write failure tests

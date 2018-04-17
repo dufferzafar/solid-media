@@ -102,32 +102,37 @@ contract MediaMarket {
         // Require a valid media
         require(_media_id > 0 && _media_id <= media_count);
 
-        // Check and Deduct cost
-        uint256 cost = media_store[_media_id].cost_company;
-        if (_customer_type == 0)
-            cost = media_store[_media_id].cost_individual;
+        Media memory M = media_store[_media_id];
 
-        uint256 balance = msg.sender.balance;
+        // Cost depends on the type of user
+        uint256 cost = M.cost_company;
+        if (_customer_type == 0)
+            cost = M.cost_individual;
 
         // Require that consumer has sufficient balance
-        require(balance >= cost);
-
-        // uint256 total = 0;
-        // for (uint i = 0; i < media_store[_media_id].stake_holders.length; i++)
-        //     uint256 share_value = (media_store[_media_id].shares[i]*cost) / 100;
-        //     media_store[_media_id].stake_holders[i].transfer(share_value);
-        //     total += share_value;
-
-        // uint256 remainder = cost - total;
-        // media_store[_media_id].creator.transfer(remainder);
-
-        // Record that a buyer has bought a media
-        purchases[msg.sender].push(media_store[_media_id]);
+        // require(msg.sender.balance >= cost);
+        require(msg.value >= cost);
 
         // TODO: Deduct amount from buyer's account
 
-        // TODO: Send amount to creator?
-        // TODO: OR Send amounts to stakeholders?
+        // TODO: Send amounts to stakeholders depending on their shares
+        // uint256 stakeholders_total = 0;
+        // for (uint i = 1; i <= M.stakeholder_count; i++) {
+
+        //     StakeHolder memory S =  media_store[_media_id].stakeholders[i];
+
+        //     // Share of this stakeholder
+        //     uint256 share_value = (S.share * cost) / 100;
+        //     S.addr.transfer(share_value);
+
+        //     stakeholders_total += share_value;
+        // }
+
+        // TODO: Send remaining amount to creator
+        // M.creator.transfer(cost - stakeholders_total);
+
+        // Record that a buyer has bought a media
+        purchases[msg.sender].push(M);
 
         emit evConsumerWantsToBuy(msg.sender, _media_id);
     }
