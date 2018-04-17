@@ -19,13 +19,36 @@ contract("MediaMarket", function(accounts) {
         assert.equal(media[1], "If I lose myself");
     });
 
-    it("allows adding a media entry", async function() {
+    it.only("allows adding a media entry", async function() {
         await market.add_media("Avengers: Infinity War", 5000, 7000);
-
-        await market.add_stakeholder(1, accounts[5], 10);
-        await market.add_stakeholder(1, accounts[6], 10);
-
         assert.equal(await market.media_count(), 2);
+    });
+
+    it("initializes with 0 stakeholders", async function() {
+        media_id = 1
+        media = await market.media_store(media_id);
+        assert.equal(media[5], 0);
+    });
+
+    it("allows adding stakeholders dynamically", async function() {
+        media_id = 2;
+
+        // Add two stakeholders
+        await market.add_stakeholder(media_id, accounts[5], 25);
+        await market.add_stakeholder(media_id, accounts[6], 15);
+
+        // Check proper count
+        media = await market.media_store(media_id);
+        assert.equal(media[5], 2, "has two stakeholders");
+
+        // Check proper stakeholders
+        stake = await market.get_stakeholder(media_id, 1);
+        assert.equal(stake[0], accounts[5]);
+        assert.equal(stake[1], 25);
+
+        stake = await market.get_stakeholder(media_id, 2);
+        assert.equal(stake[0], accounts[6]);
+        assert.equal(stake[1], 15);
     });
 
     it("allows listing available media", async function() {
@@ -34,7 +57,6 @@ contract("MediaMarket", function(accounts) {
         observed_list = [];
         for (let i = 1; i <= media_count; i++) {
             media = await market.media_store(i);
-            // console.log(media);
             observed_list.push(media[1]);
         }
 
@@ -49,7 +71,6 @@ contract("MediaMarket", function(accounts) {
         await market.buy_media(1, 1, {from: buyer});
 
         purchased_media = await market.purchases(buyer, 0);
-        // console.log(purchased_media[4]);
         assert.equal(purchased_media[0], 1);
     });
 
