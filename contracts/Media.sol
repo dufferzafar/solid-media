@@ -112,7 +112,9 @@ contract MediaMarket {
 
         // Require that consumer has sufficient balance
         // require(msg.sender.balance >= cost);
-        require(msg.value >= cost);
+
+        // TODO: Only except exact amount?
+        require(msg.value == cost);
 
         // TODO: Deduct amount from buyer's account
 
