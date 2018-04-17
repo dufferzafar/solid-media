@@ -34,6 +34,7 @@ contract("MediaMarket", function(accounts) {
         observed_list = [];
         for (let i = 1; i <= media_count; i++) {
             media = await market.media_store(i);
+	    //console.log(media);
             observed_list.push(media[1]);
         }
 
@@ -48,7 +49,7 @@ contract("MediaMarket", function(accounts) {
         await market.buy_media(1, 1, {from: buyer});
 
         purchased_media = await market.purchases(buyer, 0);
-
+	//console.log(purchased_media[4]);
         assert.equal(purchased_media[0], 1);
     });
 
