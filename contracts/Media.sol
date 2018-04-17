@@ -48,7 +48,8 @@ contract MediaMarket {
 
     // Constructor
     function MediaMarket () public {
-        add_media("If I lose myself", 10000000000, 20000000000);
+        // TODO: Should the cost be exactly in Ether?
+        add_media("If I lose myself", 1 finney, 2 finney);
     }
 
     /////////////////////////////////////////////////////////////////////////
