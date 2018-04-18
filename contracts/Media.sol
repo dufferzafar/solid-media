@@ -29,12 +29,19 @@ contract MediaMarket {
         uint stakeholder_count;
 
     }
+	
+	struct Records {
+		uint256 media_id;
+		string url;
+		//uint256 purchase_count;
+	}
 
     /////////////////////////////////////////////////////////////////////////
 
     // Store accounts that have bought a media.
 
-    mapping(address => Media[]) public purchases;
+    mapping(address => Records[]) public purchases;
+	//mapping(address => bool) public purchase_exist;
 
     // Store all available media
 
@@ -124,6 +131,18 @@ contract MediaMarket {
 		return true;
 	}
 	/////////////////////////////////////////////////////////////////////////
+	
+	function check_purchased_media(address _buyer, uint256 _media_id) public returns (bool) {
+		//uint256 len = purchases[_buyer].length;
+		
+		for (uint i = 0; i < purchases[_buyer].length; i++) {
+			if (purchases[_buyer][i].media_id == _media_id)
+				return false;
+		}
+		return true;
+	}
+	
+	/////////////////////////////////////////////////////////////////////////
 
     // This will be called when someone wants to buy a media
 
@@ -131,7 +150,10 @@ contract MediaMarket {
 
         // TODO: Require that they haven't already bought the same media before
         // require(purchases[msg.sender] != media_store[_media_id]);
-
+		
+		bool flag = check_purchased_media(msg.sender, _media_id);
+		require(flag == true);
+	
         // Require a valid media
 
         require(_media_id > 0 && _media_id <= media_count);
@@ -173,12 +195,18 @@ contract MediaMarket {
         M.creator.transfer(cost - stakeholders_total);
 
         // Record that a buyer has bought a media
-
-        purchases[msg.sender].push(M);
+		//if(purchase_exist[msg.sender] == False)
+			//purchases[msg.sender] = Purchase_records(0);
+		//purchases[msg.sender].purchase_count++;
+		//purchases[msg.sender].list[purchases[msg.sender].purchase_count] = M;
+		//purchases[msg.sender].urls[purchases[msg.sender].purchase_count] = "";
+		purchases[msg.sender].push(Records(_media_id,""));
 
         emit evConsumerWantsToBuy(msg.sender, _media_id);
 
     }
+	
+	
 	
     /////////////////////////////////////////////////////////////////////////
 
@@ -199,6 +227,8 @@ contract MediaMarket {
         require(msg.sender == media.creator);
 
         // TODO: Save URL into a mapping so buyer can access it later
+		uint256 len = purchases[_buyer].length;
+		purchases[_buyer][len-1].url= _url;
 
         emit evURLForMedia(_buyer, _media_id, _url);
 
