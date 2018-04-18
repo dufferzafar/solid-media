@@ -150,7 +150,31 @@ contract("MediaMarket", function(accounts) {
 
         // Ensure that it was bought
         purchased_media = await market.purchases(buyer, 0);
+		console.log(purchased_media);
         assert.equal(purchased_media[0], media_id);
+    });
+	
+	it("fails when trying to buy same media again", async function() {
+        media_id = 2;
+        buyer = accounts[0];
+
+        // Find proper costs of the media
+        media = await market.media_store(media_id);
+        media_cost = media[3];
+
+        // Buy it
+		// Try adding same stakeholder; should fail!
+        try {
+            await market.buy_media(media_id, INDIVIDUAL, {from: buyer, value: media_cost});
+        } catch (e) {
+            assert(e.message.endsWith("revert"));
+        }
+        
+
+        // Ensure that it was bought
+        //purchased_media = await market.purchases(buyer, 0);
+		//console.log(purchased_media);
+        //assert.equal(purchased_media[0], media_id);
     });
 
     it("triggers an event when buying", async function() {
@@ -213,6 +237,7 @@ contract("MediaMarket", function(accounts) {
         async function creator_ev_handler(error, event) {
             if (!error) {
                 buyers_address = event.args.buyer;
+				//purchase_id = event.args.purchase_id;
 
                 // TODO: A dict of URLs for other media ?!
                 plain_url = "http://www.google.com";
