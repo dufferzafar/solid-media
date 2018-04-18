@@ -27,7 +27,7 @@ contract("MediaMarket", function(accounts) {
         );
 
         await market.add_media(
-            "Avengers: Infinity War", 50 * finney, 70 * finney, {from: accounts[4]}
+            "Avengers: Infinity War", 2000 * finney, 4000 * finney, {from: accounts[4]}
         );
 
         assert.equal(await market.media_count(), 2);
@@ -121,8 +121,24 @@ contract("MediaMarket", function(accounts) {
         assert.equal(media[5], 5, "still has 5 stakeholders");
     });
 
+    it("fails when adding same stakeholder twice", async function() {
+        media_id = 2;
+
+        // Try adding same stakeholder; should fail!
+        try {
+            await market.add_stakeholder(
+                media_id, accounts[8], 5, {from: accounts[4]}
+            );
+        } catch (e) {
+            assert(e.message.endsWith("revert"));
+        }
+
+        media = await market.media_store(media_id);
+        assert.equal(media[5], 5, "still has 5 stakeholders");
+    });
+
     it("allows buying a media", async function() {
-        media_id = 1;
+        media_id = 2;
         buyer = accounts[0];
 
         // Find proper costs of the media
