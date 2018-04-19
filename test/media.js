@@ -1,4 +1,8 @@
 const EthEnc = require("ethereum-encryption");
+const chai = require("chai");
+const chaiAsPromised = require("chai-as-promised");
+chai.use(chaiAsPromised);
+global.assert = chai.assert;
 
 const MediaMarket = artifacts.require("./MediaMarket.sol");
 
@@ -94,13 +98,7 @@ contract("MediaMarket", function(accounts) {
 
         // accounts[5] has already been added as a stakeholder above
         // Adding it again should fail!
-        try {
-            await market.add_stakeholder(
-                media_id, accounts[5], 5, {from: accounts[4]}
-            );
-        } catch (e) {
-            assert(e.message.endsWith("revert"));
-        }
+        assert.isRejected(market.add_stakeholder(media_id, accounts[5], 5, {from: accounts[4]}));
 
         let media = await market.media_store(media_id);
         assert.equal(media[5], 2, "still has 2 stakeholders");
@@ -128,13 +126,7 @@ contract("MediaMarket", function(accounts) {
         let media_id = 2;
 
         // Try adding 1 more stakeholder; should fail!
-        try {
-            await market.add_stakeholder(
-                media_id, accounts[4], 5, {from: accounts[4]}
-            );
-        } catch (e) {
-            assert(e.message.endsWith("revert"));
-        }
+        assert.isRejected(market.add_stakeholder(media_id, accounts[4], 5, {from: accounts[4]}));
 
         let media = await market.media_store(media_id);
         assert.equal(media[5], 5, "still has 5 stakeholders");
@@ -164,7 +156,7 @@ contract("MediaMarket", function(accounts) {
         assert(purchased_record[0] == true);
     });
 
-    it("fails when trying to buy same media again", async function() {
+    it("fails when buying same media again", async function() {
         let media_id = 2;
         let buyer = accounts[0];
 
@@ -172,12 +164,7 @@ contract("MediaMarket", function(accounts) {
         let media = await market.media_store(media_id);
         let media_cost = media[3];
 
-        // Try Buying it; should fail!
-        try {
-            await market.buy_media(media_id, INDIVIDUAL, {from: buyer, value: media_cost});
-        } catch (e) {
-            assert(e.message.endsWith("revert"));
-        }
+        assert.isRejected(market.buy_media(media_id, INDIVIDUAL, {from: buyer, value: media_cost}));
     });
 
     it("triggers an event when buying", async function() {
@@ -293,7 +280,6 @@ contract("MediaMarket", function(accounts) {
                     2: "http://creator.storage.com/media/2",
                 };
 
-                // TODO: A dict of URLs for other media ?!
                 let plain_url = media_urls[media_id];
                 expected_url = plain_url;
 
@@ -356,7 +342,6 @@ contract("MediaMarket", function(accounts) {
     });
 
     // TODO: Write failure tests
-    // it("fails when wrong media is bought");
     // it("fails when buyer has insufficient balance");
     // it("fails when stakeholder shares don't sum up to 100");
 
