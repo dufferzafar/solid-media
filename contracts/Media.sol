@@ -155,23 +155,28 @@ contract MediaMarket {
 
     /////////////////////////////////////////////////////////////////////////
 
-    // This will be called when a creator wants to send an encrypted URL back to buyer
     function url_for_media (address _buyer, uint256 _media_id, string _url) public {
 
         // Require a valid media
         require(_media_id > 0 && _media_id <= media_count);
 
-        // TODO: require that this call is in response to an appropriate evConsumerWantsToBuy event!?
-        // So that not anyone can call this anytime
         Media memory media = media_store[_media_id];
+
+        // We could require that this call is in response to an appropriate
+        // evConsumerWantsToBuy event so that not anyone can call this anytime !?
+
+        // Currently, this function can be called by the creator at some later time
+        // in case they want to update the URLs of users
+        // (say when the storage server moves etc.)
 
         // require that this is only called by the creator of the media
         require(msg.sender == media.creator);
 
         // Save URL into a mapping so buyer can access it later
-        // FIXME: This currently requires the events to be synchronous?
-        uint256 len = purchases[_buyer].length;
-        purchases[_buyer][len-1].url = _url;
+        for (uint i = 0; i < purchases[_buyer].length; i++) {
+            if (purchases[_buyer][i].media_id == _media_id)
+                purchases[_buyer][i].url = _url;
+        }
 
         emit evURLForMedia(_buyer, _media_id, _url);
     }
