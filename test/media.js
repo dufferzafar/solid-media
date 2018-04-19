@@ -22,6 +22,7 @@ contract("MediaMarket", function(accounts) {
     });
 
     it("allows adding media entries", async function() {
+        // TODO: 2 more media?
         await market.add_media(
             "If I lose myself", 1000 * finney, 2000 * finney, {from: accounts[3]}
         );
@@ -46,6 +47,10 @@ contract("MediaMarket", function(accounts) {
 
         assert.deepEqual(observed_list, expected_list);
     });
+
+    ///////////////////////////////////////////////////////////////////////////
+    //                               Stakeholders
+    ///////////////////////////////////////////////////////////////////////////
 
     it("initializes with 0 stakeholders", async function() {
         media_id = 1;
@@ -87,6 +92,23 @@ contract("MediaMarket", function(accounts) {
         assert.equal(stake[1], 15);
     });
 
+    it("fails when adding same stakeholder twice", async function() {
+        media_id = 2;
+
+        // accounts[5] has already been added as a stakeholder above
+        // Adding it again should fail!
+        try {
+            await market.add_stakeholder(
+                media_id, accounts[5], 5, {from: accounts[4]}
+            );
+        } catch (e) {
+            assert(e.message.endsWith("revert"));
+        }
+
+        media = await market.media_store(media_id);
+        assert.equal(media[5], 2, "still has 2 stakeholders");
+    });
+
     it("allows upto 5 stakeholders", async function() {
         media_id = 2;
 
@@ -121,21 +143,9 @@ contract("MediaMarket", function(accounts) {
         assert.equal(media[5], 5, "still has 5 stakeholders");
     });
 
-    it("fails when adding same stakeholder twice", async function() {
-        media_id = 2;
-
-        // Try adding same stakeholder; should fail!
-        try {
-            await market.add_stakeholder(
-                media_id, accounts[8], 5, {from: accounts[4]}
-            );
-        } catch (e) {
-            assert(e.message.endsWith("revert"));
-        }
-
-        media = await market.media_store(media_id);
-        assert.equal(media[5], 5, "still has 5 stakeholders");
-    });
+    ///////////////////////////////////////////////////////////////////////////
+    //                             Buying Media
+    ///////////////////////////////////////////////////////////////////////////
 
     it("allows buying a media", async function() {
         media_id = 2;
@@ -150,7 +160,6 @@ contract("MediaMarket", function(accounts) {
 
         // Ensure that it was bought
         purchased_media = await market.purchases(buyer, 0);
-        // console.log(purchased_media);
         assert.equal(purchased_media[0], media_id);
     });
 
@@ -216,7 +225,11 @@ contract("MediaMarket", function(accounts) {
         // and also need to account for the Gas used.
     });
 
-    it("allows communication via contract", async function() {
+    ///////////////////////////////////////////////////////////////////////////
+    //                          Full Integration Test
+    ///////////////////////////////////////////////////////////////////////////
+
+    it("fully works", async function() {
         // These values will be filled by the creator/buyer
         // Initial values should be different!
         // so we can show that everything is working correctly.
@@ -306,4 +319,7 @@ contract("MediaMarket", function(accounts) {
 
     // it("deducts the right cost for individual")
     // it("deducts the right cost for company")
+
+    // it("stores the encrypted URL")
+    // it("pays the stakeholders when buying")
 });
