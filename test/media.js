@@ -41,15 +41,15 @@ contract("MediaMarket", function(accounts) {
     });
 
     it("allows listing available media", async function() {
-        media_count = await market.media_count();
+        let media_count = await market.media_count();
 
-        observed_list = [];
+        let observed_list = [];
         for (let i = 1; i <= media_count; i++) {
-            media = await market.media_store(i);
+            let media = await market.media_store(i);
             observed_list.push(media[1]);
         }
 
-        expected_list = ["If I lose myself", "Avengers: Infinity War"];
+        let expected_list = ["If I lose myself", "Avengers: Infinity War"];
 
         assert.deepEqual(observed_list, expected_list);
     });
@@ -59,8 +59,8 @@ contract("MediaMarket", function(accounts) {
     // /////////////////////////////////////////////////////////////////////////
 
     it("initializes with 0 stakeholders", async function() {
-        media_id = 1;
-        media = await market.media_store(media_id);
+        let media_id = 1;
+        let media = await market.media_store(media_id);
         assert.equal(media[5], 0);
     });
 
@@ -73,7 +73,7 @@ contract("MediaMarket", function(accounts) {
     });
 
     it("allows adding stakeholders dynamically", async function() {
-        media_id = 2;
+        let media_id = 2;
 
         // Add 2 stakeholders
         await market.add_stakeholder(
@@ -84,23 +84,13 @@ contract("MediaMarket", function(accounts) {
             media_id, accounts[6], 15, {from: accounts[4]}
         );
 
-        // Check proper count
-        media = await market.media_store(media_id);
+        // Ensure proper count
+        let media = await market.media_store(media_id);
         assert.equal(media[5], 2, "has 2 stakeholders");
-
-        // Check proper stakeholders
-        // TODO: Convert to list compare?
-        stake = await market.get_stakeholder(media_id, 1);
-        assert.equal(stake[0], accounts[5]);
-        assert.equal(stake[1], 25);
-
-        stake = await market.get_stakeholder(media_id, 2);
-        assert.equal(stake[0], accounts[6]);
-        assert.equal(stake[1], 15);
     });
 
     it("fails when adding same stakeholder twice", async function() {
-        media_id = 2;
+        let media_id = 2;
 
         // accounts[5] has already been added as a stakeholder above
         // Adding it again should fail!
@@ -112,12 +102,12 @@ contract("MediaMarket", function(accounts) {
             assert(e.message.endsWith("revert"));
         }
 
-        media = await market.media_store(media_id);
+        let media = await market.media_store(media_id);
         assert.equal(media[5], 2, "still has 2 stakeholders");
     });
 
     it("allows upto 5 stakeholders", async function() {
-        media_id = 2;
+        let media_id = 2;
 
         // Add three more stakeholders
         await market.add_stakeholder(
@@ -130,12 +120,12 @@ contract("MediaMarket", function(accounts) {
             media_id, accounts[9], 5, {from: accounts[4]}
         );
 
-        media = await market.media_store(media_id);
+        let media = await market.media_store(media_id);
         assert.equal(media[5], 5, "has 5 stakeholders");
     });
 
     it("fails when adding more than 5 stakeholders", async function() {
-        media_id = 2;
+        let media_id = 2;
 
         // Try adding 1 more stakeholder; should fail!
         try {
@@ -146,7 +136,7 @@ contract("MediaMarket", function(accounts) {
             assert(e.message.endsWith("revert"));
         }
 
-        media = await market.media_store(media_id);
+        let media = await market.media_store(media_id);
         assert.equal(media[5], 5, "still has 5 stakeholders");
     });
 
@@ -155,28 +145,28 @@ contract("MediaMarket", function(accounts) {
     // /////////////////////////////////////////////////////////////////////////
 
     it("allows buying a media", async function() {
-        media_id = 2;
-        buyer = accounts[0];
+        let media_id = 2;
+        let buyer = accounts[0];
 
         // Find proper costs of the media
-        media = await market.media_store(media_id);
-        media_cost = media[3];
+        let media = await market.media_store(media_id);
+        let media_cost = media[3];
 
         // Buy it
         await market.buy_media(media_id, INDIVIDUAL, {from: buyer, value: media_cost});
 
         // Ensure that it was bought
-        purchased_media = await market.purchases(buyer, 0);
+        let purchased_media = await market.purchases(buyer, 0);
         assert.equal(purchased_media[0], media_id);
     });
 
     it("fails when trying to buy same media again", async function() {
-        media_id = 2;
-        buyer = accounts[0];
+        let media_id = 2;
+        let buyer = accounts[0];
 
         // Find proper costs of the media
-        media = await market.media_store(media_id);
-        media_cost = media[3];
+        let media = await market.media_store(media_id);
+        let media_cost = media[3];
 
         // Try Buying it; should fail!
         try {
@@ -187,7 +177,7 @@ contract("MediaMarket", function(accounts) {
     });
 
     it("triggers an event when buying", async function() {
-        buyer = accounts[1];
+        let buyer = accounts[1];
 
         // Start watching for the Buy event to pop up
         let event = market.evConsumerWantsToBuy({}, {});
@@ -204,20 +194,20 @@ contract("MediaMarket", function(accounts) {
 
     it("pays the creator when buying", async function() {
         // Details of the media being bought
-        media_id = 1;
-        media = await market.media_store(media_id);
-        media_cost = media[3].toNumber();
-        media_creator = media[2];
+        let media_id = 1;
+        let media = await market.media_store(media_id);
+        let media_cost = media[3].toNumber();
+        let media_creator = media[2];
 
         // Find balance of creator, before
-        cbal_before = web3.eth.getBalance(media_creator).toNumber();
+        let cbal_before = web3.eth.getBalance(media_creator).toNumber();
 
         await market.buy_media(
             media_id, INDIVIDUAL, {from: accounts[4], value: media_cost}
         );
 
         // Find balance of creator, after
-        cbal_after = web3.eth.getBalance(media_creator).toNumber();
+        let cbal_after = web3.eth.getBalance(media_creator).toNumber();
 
         // The entire cost must go to the creator as media 1 has no stakeholders
         assert.equal(cbal_after, cbal_before + media_cost);
@@ -229,19 +219,19 @@ contract("MediaMarket", function(accounts) {
 
     it("also pays the stakeholders when buying", async function() {
         // Details of the media being bought
-        media_id = 2;
-        media = await market.media_store(media_id);
-        media_cost = media[3].toNumber();
-        media_creator = media[2];
-        stakeholder_count = media[5];
+        let media_id = 2;
+        let media = await market.media_store(media_id);
+        let media_cost = media[3].toNumber();
+        let media_creator = media[2];
+        let stakeholder_count = media[5];
 
         // Account 5, 6, 7, 8, 9 are the 5 stakeholders of media 2
         // with 25, 15, 5, 5, 5 % stake each.
         // Account 4 is the creator!
 
         // Get all stakeholders of media 2
-        parties = [];
-        total_stake_share = 0;
+        let parties = [];
+        let total_stake_share = 0;
         for (let i = 1; i <= stakeholder_count; i++) {
             let h = await market.get_stakeholder(media_id, i);
             let holder = {addr: h[0].toString(), share: h[1].toNumber()};
@@ -254,7 +244,7 @@ contract("MediaMarket", function(accounts) {
         parties.push({addr: media_creator, share: 100 - total_stake_share});
 
         // Find balances of all involved parties, before
-        bal_before = parties.map((h) => web3.eth.getBalance(h.addr).toNumber());
+        let bal_before = parties.map((h) => web3.eth.getBalance(h.addr).toNumber());
 
         // Sanity check
         assert.equal(bal_before.length, 6);
@@ -265,7 +255,7 @@ contract("MediaMarket", function(accounts) {
         );
 
         // Find balances of all involved parties, after
-        bal_after = parties.map((h) => web3.eth.getBalance(h.addr).toNumber());
+        let bal_after = parties.map((h) => web3.eth.getBalance(h.addr).toNumber());
 
         // Confirm that every party got their share
         parties.forEach((h, i) => assert.equal(bal_after[i], bal_before[i] + (h.share / 100) * media_cost));
@@ -279,28 +269,28 @@ contract("MediaMarket", function(accounts) {
         // These values will be filled by the creator/buyer
         // Initial values should be different!
         // so we can show that everything is working correctly.
-        observed_url = "X";
-        expected_url = "Y";
+        let observed_url = "X";
+        let expected_url = "Y";
 
         // We'll try things out with media 1
-        media_id = 1;
+        let media_id = 1;
 
         // TODO: Find a way to extract the public key from a buyer's address (using on-chain data)
-        buyers_pub_key = "03463c760cabfe2ea0529c0335656fd12b0c81fc40c478d197ae7384f197bfca1b";
+        let buyers_pub_key = "03463c760cabfe2ea0529c0335656fd12b0c81fc40c478d197ae7384f197bfca1b";
 
         // This simulates a creator
         // who is watching for a buy event to happen
         // and will respond with an encrypted URL
         async function creator_ev_handler(error, event) {
             if (!error) {
-                buyers_address = event.args.buyer;
+                let buyers_address = event.args.buyer;
                 // purchase_id = event.args.purchase_id;
 
                 // TODO: A dict of URLs for other media ?!
-                plain_url = "http://www.google.com";
+                let plain_url = "http://www.google.com";
                 expected_url = plain_url;
 
-                encrypted_url = await EthEnc.encryptWithPublicKey(buyers_pub_key, plain_url);
+                let encrypted_url = await EthEnc.encryptWithPublicKey(buyers_pub_key, plain_url);
 
                 // console.log("Sending URL to contract: " + encrypted_url);
 
@@ -315,16 +305,16 @@ contract("MediaMarket", function(accounts) {
             }
         }
 
-        buy_event = market.evConsumerWantsToBuy({}, {});
+        let buy_event = market.evConsumerWantsToBuy({}, {});
         buy_event.watch(creator_ev_handler);
 
         // The placement of these lines signifies that:
         // the creator, defined above, doesn't know who a particular buyer is
         // while the buyer, defined below, knows their own address
-        buyer = accounts[2];
+        let buyer = accounts[2];
 
         // Similarly, only a buyer knows their own private key
-        buyers_pvt_key = "43137cdb869f4375abfce46910aa24d528b2152c5a396158550158fbdb160b4f";
+        let buyers_pvt_key = "43137cdb869f4375abfce46910aa24d528b2152c5a396158550158fbdb160b4f";
 
         // This simulates a buyer
         // who is waiting to receive an encrypted URL
@@ -333,8 +323,8 @@ contract("MediaMarket", function(accounts) {
                 // React only if this message was meant for me
                 // Other people won't be able to decrypt this message anyway
                 if (event.args.buyer == buyer) {
-                    encrypted_url = event.args.url;
-                    decrypted_url = await EthEnc.decryptWithPrivateKey(buyers_pvt_key, encrypted_url);
+                    let encrypted_url = event.args.url;
+                    let decrypted_url = await EthEnc.decryptWithPrivateKey(buyers_pvt_key, encrypted_url);
 
                     observed_url = decrypted_url;
 
@@ -342,7 +332,7 @@ contract("MediaMarket", function(accounts) {
                     assert.equal(observed_url, expected_url);
 
                     // Confirm that the encrypted URL was stored on the chain
-                    purchased_media = await market.purchases(buyer, 0);
+                    let purchased_media = await market.purchases(buyer, 0);
                     assert.equal(purchased_media[1], encrypted_url);
 
                     // I got what I wanted, game over!
@@ -351,7 +341,7 @@ contract("MediaMarket", function(accounts) {
             }
         }
 
-        url_event = market.evURLForMedia({}, {});
+        let url_event = market.evURLForMedia({}, {});
         url_event.watch(buyer_ev_handler);
 
         // FIXME: Enabling these lines prevents buyer_ev_handler from ending
