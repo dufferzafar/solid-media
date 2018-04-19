@@ -8,7 +8,7 @@ const MediaMarket = artifacts.require("./MediaMarket.sol");
 
 // Ethereum Units
 const finney = Math.pow(10, 15);
-// const ether = Math.pow(10, 18);
+const ether = Math.pow(10, 18);
 
 // Type of consumer
 const INDIVIDUAL = 0;
@@ -32,7 +32,6 @@ contract("MediaMarket", function(accounts) {
     });
 
     it("allows adding media entries", async function() {
-        // TODO: 2 more media?
         await market.add_media(
             "If I lose myself", 1000 * finney, 2000 * finney, {from: accounts[3]}
         );
@@ -41,7 +40,11 @@ contract("MediaMarket", function(accounts) {
             "Avengers: Infinity War", 2000 * finney, 4000 * finney, {from: accounts[4]}
         );
 
-        assert.equal(await market.media_count(), 2);
+        await market.add_media(
+            "Harry Potter & The Cursed Child", 1 * ether, 1.5 * ether, {from: accounts[5]}
+        );
+
+        assert.equal(await market.media_count(), 3);
     });
 
     it("allows listing available media", async function() {
@@ -53,7 +56,11 @@ contract("MediaMarket", function(accounts) {
             observed_list.push(media[1]);
         }
 
-        let expected_list = ["If I lose myself", "Avengers: Infinity War"];
+        let expected_list = [
+            "If I lose myself",
+            "Avengers: Infinity War",
+            "Harry Potter & The Cursed Child",
+        ];
 
         assert.deepEqual(observed_list, expected_list);
     });
