@@ -19,17 +19,14 @@ contract MediaMarket {
         uint256 cost_individual;
         uint256 cost_company;
 
+        // Stakeholders of this media
         mapping(uint256 => StakeHolder) stakeholders;
-
         uint stakeholder_count;
 
     }
 
     // TODO: Unique Purchase ID
-    struct Records {
-        uint256 media_id;
-        string url;
-    }
+    struct PurchaseRecord {uint256 media_id; string url;}
 
     /////////////////////////////////////////////////////////////////////////
 
@@ -38,7 +35,7 @@ contract MediaMarket {
     uint public media_count;
 
     // Store accounts that have bought a media.
-    mapping(address => Records[]) public purchases;
+    mapping(address => PurchaseRecord[]) public purchases;
 
     // Will be fired when a buyer wants to buy a media
     // Will be captured by the creator who will send back an encrypted URL
@@ -46,21 +43,17 @@ contract MediaMarket {
     event evConsumerWantsToBuy(address buyer, uint256 media_id);
 
     // Will be fired when a creator has sent an encrypted URL
-    // Will be captured by the buery who needs this
+    // Will be captured by the buyer who needs this
     // TODO: Add purchase ID, to uniquely identify a purchase
     event evURLForMedia(address buyer, uint256 media_id, string url);
 
     /////////////////////////////////////////////////////////////////////////
-
-    // This will be called when someone wants to add a new media
 
     function add_media (string _name, uint256 _cost_individual, uint256 _cost_company) public {
         media_store[++media_count] = Media(media_count, _name, msg.sender, _cost_individual, _cost_company, 0);
     }
 
     /////////////////////////////////////////////////////////////////////////
-
-    // This will be called by the creator to add stakeholders of a media
 
     function add_stakeholder(uint256 _media_id, address _addr, uint256 _share) public {
 
@@ -69,7 +62,7 @@ contract MediaMarket {
 
         Media storage M = media_store[_media_id];
 
-        // Only a media creator should be able to add stakeholders
+        // Require that only a media creator is able to add stakeholders
         require(msg.sender == M.creator);
 
         // Require that stakeholders have different addresses
@@ -94,7 +87,7 @@ contract MediaMarket {
         return (S.addr, S.share);
     }
 
-    function not_already_stakeholder(uint256 _media_id, address _addr) public view returns (bool){
+    function not_already_stakeholder(uint256 _media_id, address _addr) private view returns (bool) {
         Media memory M = media_store[_media_id];
 
         for (uint i = 1; i <= M.stakeholder_count; i++) {
@@ -108,7 +101,7 @@ contract MediaMarket {
 
     /////////////////////////////////////////////////////////////////////////
 
-    function not_already_purchased(address _buyer, uint256 _media_id) public view returns (bool) {
+    function not_already_purchased(address _buyer, uint256 _media_id) private view returns (bool) {
         for (uint i = 0; i < purchases[_buyer].length; i++) {
             if (purchases[_buyer][i].media_id == _media_id)
                 return false;
@@ -118,8 +111,6 @@ contract MediaMarket {
     }
 
     /////////////////////////////////////////////////////////////////////////
-
-    // This will be called when someone wants to buy a media
 
     function buy_media (uint256 _media_id, uint _customer_type) public payable {
 
@@ -157,7 +148,7 @@ contract MediaMarket {
         M.creator.transfer(cost - stakeholders_total);
 
         // Record that a buyer has bought a media
-        purchases[msg.sender].push(Records(_media_id, ""));
+        purchases[msg.sender].push(PurchaseRecord(_media_id, ""));
 
         emit evConsumerWantsToBuy(msg.sender, _media_id);
     }
