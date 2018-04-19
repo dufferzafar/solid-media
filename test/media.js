@@ -10,6 +10,12 @@ const finney = Math.pow(10, 15);
 const INDIVIDUAL = 0;
 // const COMPANY = 1;
 
+// TODO: Change account indices of all?
+// TODO: Go through the tests
+
+// These tests are not really unit tests, since a lot of them
+// depend on other tests to run (which modify state)
+
 contract("MediaMarket", function(accounts) {
     let market; // Will store an instance of our contract
 
@@ -48,9 +54,9 @@ contract("MediaMarket", function(accounts) {
         assert.deepEqual(observed_list, expected_list);
     });
 
-    ///////////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////////
     //                               Stakeholders
-    ///////////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////////
 
     it("initializes with 0 stakeholders", async function() {
         media_id = 1;
@@ -83,6 +89,7 @@ contract("MediaMarket", function(accounts) {
         assert.equal(media[5], 2, "has 2 stakeholders");
 
         // Check proper stakeholders
+        // TODO: Convert to list compare?
         stake = await market.get_stakeholder(media_id, 1);
         assert.equal(stake[0], accounts[5]);
         assert.equal(stake[1], 25);
@@ -143,9 +150,9 @@ contract("MediaMarket", function(accounts) {
         assert.equal(media[5], 5, "still has 5 stakeholders");
     });
 
-    ///////////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////////
     //                             Buying Media
-    ///////////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////////
 
     it("allows buying a media", async function() {
         media_id = 2;
@@ -177,11 +184,6 @@ contract("MediaMarket", function(accounts) {
         } catch (e) {
             assert(e.message.endsWith("revert"));
         }
-
-        // Ensure that it was bought
-        // purchased_media = await market.purchases(buyer, 0);
-        // console.log(purchased_media);
-        // assert.equal(purchased_media[0], media_id);
     });
 
     it("triggers an event when buying", async function() {
@@ -196,7 +198,7 @@ contract("MediaMarket", function(accounts) {
             }
         });
 
-        // Find proper costs of the media
+        // Initiate a purchase
         await market.buy_media(1, INDIVIDUAL, {from: buyer, value: 1000 * finney});
     });
 
@@ -222,12 +224,56 @@ contract("MediaMarket", function(accounts) {
 
         // The same test wouldn't work for buyer since
         // we're executing a transaction from him
-        // and also need to account for the Gas used.
+        // and will also need to account for the Gas used.
     });
 
-    ///////////////////////////////////////////////////////////////////////////
+    it("also pays the stakeholders when buying", async function() {
+        // Details of the media being bought
+        media_id = 2;
+        media = await market.media_store(media_id);
+        media_cost = media[3].toNumber();
+        media_creator = media[2];
+        stakeholder_count = media[5];
+
+        // Account 5, 6, 7, 8, 9 are the 5 stakeholders of media 2
+        // with 25, 15, 5, 5, 5 % stake each.
+        // Account 4 is the creator!
+
+        // Get all stakeholders of media 2
+        parties = [];
+        total_stake_share = 0;
+        for (var i = 1; i <= stakeholder_count; i++) {
+            let h = await market.get_stakeholder(media_id, i);
+            let holder = {addr: h[0].toString(), share: h[1].toNumber()};
+
+            total_stake_share += holder.share;
+            parties.push(holder);
+        }
+
+        // Technically, a creator is a stakeholder too
+        parties.push({addr: media_creator, share: 100 - total_stake_share});
+
+        // Find balances of all involved parties, before
+        bal_before = parties.map(h => web3.eth.getBalance(h.addr).toNumber());
+
+        // Sanity check
+        assert.equal(bal_before.length, 6)
+
+        // Buy the media
+        await market.buy_media(
+            media_id, INDIVIDUAL, {from: accounts[3], value: media_cost}
+        );
+
+        // Find balances of all involved parties, after
+        bal_after = parties.map(h => web3.eth.getBalance(h.addr).toNumber());
+
+        // Confirm that every party got their share
+        parties.forEach((h, i) => assert.equal(bal_after[i], bal_before[i] + (h.share / 100) * media_cost));
+    });
+
+    // /////////////////////////////////////////////////////////////////////////
     //                          Full Integration Test
-    ///////////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////////
 
     it("fully works", async function() {
         // These values will be filled by the creator/buyer
@@ -321,5 +367,4 @@ contract("MediaMarket", function(accounts) {
     // it("deducts the right cost for company")
 
     // it("stores the encrypted URL")
-    // it("pays the stakeholders when buying")
 });
