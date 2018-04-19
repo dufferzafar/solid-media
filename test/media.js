@@ -152,12 +152,16 @@ contract("MediaMarket", function(accounts) {
         let media = await market.media_store(media_id);
         let media_cost = media[3];
 
+        // It wasn't already bought
+        let purchased_record = await market.purchases(buyer, media_id);
+        assert(purchased_record[0] == false);
+
         // Buy it
         await market.buy_media(media_id, INDIVIDUAL, {from: buyer, value: media_cost});
 
-        // Ensure that it was bought
-        let purchased_media = await market.purchases(buyer, 0);
-        assert.equal(purchased_media[0], media_id);
+        // Has been bought now
+        purchased_record = await market.purchases(buyer, media_id);
+        assert(purchased_record[0] == true);
     });
 
     it("fails when trying to buy same media again", async function() {
@@ -286,8 +290,8 @@ contract("MediaMarket", function(accounts) {
                 // A creator knows URLs to all media
                 let media_urls = {
                     1: "http://creator.storage.com/media/1",
-                    2: "http://creator.storage.com/media/2"
-                }
+                    2: "http://creator.storage.com/media/2",
+                };
 
                 // TODO: A dict of URLs for other media ?!
                 let plain_url = media_urls[media_id];
@@ -335,8 +339,8 @@ contract("MediaMarket", function(accounts) {
                     assert.equal(observed_url, expected_url);
 
                     // Confirm that the encrypted URL was stored on the chain
-                    let purchased_media = await market.purchases(buyer, 0);
-                    assert.equal(purchased_media[1], encrypted_url);
+                    let purchased_record = await market.purchases(buyer, event.args.media_id);
+                    assert.equal(purchased_record[1], encrypted_url);
 
                     // I got what I wanted, game over!
                     url_event.stopWatching();

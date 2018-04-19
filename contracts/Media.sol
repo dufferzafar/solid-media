@@ -25,26 +25,22 @@ contract MediaMarket {
 
     }
 
-    // TODO: Unique Purchase ID
-    struct PurchaseRecord {uint256 media_id; string url;}
-
-    /////////////////////////////////////////////////////////////////////////
-
-    // Store all available media
+    // Store available media
     mapping(uint256 => Media) public media_store;
     uint public media_count;
 
     // Store accounts that have bought a media.
-    mapping(address => PurchaseRecord[]) public purchases;
+    struct PurchaseRecord {bool purchased; string url;}
+    mapping(address => mapping(uint256 => PurchaseRecord)) public purchases;
+
+    /////////////////////////////////////////////////////////////////////////
 
     // Will be fired when a buyer wants to buy a media
     // Will be captured by the creator who will send back an encrypted URL
-    // TODO: Add purchase ID, to uniquely identify a purchase
     event evConsumerWantsToBuy(address buyer, uint256 media_id);
 
     // Will be fired when a creator has sent an encrypted URL
     // Will be captured by the buyer who needs this
-    // TODO: Add purchase ID, to uniquely identify a purchase
     event evURLForMedia(address buyer, uint256 media_id, string url);
 
     /////////////////////////////////////////////////////////////////////////
@@ -68,7 +64,8 @@ contract MediaMarket {
         // Require that stakeholders have different addresses
         require(not_already_stakeholder(_media_id, _addr));
 
-        // TODO: Require that sum of shares of each StakeHolder should be < 100?
+        // We could also require that sum of shares of each StakeHolder should be < 100
+        // But since we assume that the creator is honest, these checks aren't neccessary?
 
         // A media may have a maximum of 5 stakeholders
         require(M.stakeholder_count < 5);
@@ -78,6 +75,9 @@ contract MediaMarket {
     }
 
     function get_stakeholder(uint256 _media_id, uint256 _idx) public view returns (address, uint256) {
+
+        // Require a valid media
+        require(_media_id > 0 && _media_id <= media_count);
 
         // Require a valid stakeholder
         require(_idx > 0 && _idx <= media_store[_media_id].stakeholder_count);
@@ -101,24 +101,13 @@ contract MediaMarket {
 
     /////////////////////////////////////////////////////////////////////////
 
-    function not_already_purchased(address _buyer, uint256 _media_id) private view returns (bool) {
-        for (uint i = 0; i < purchases[_buyer].length; i++) {
-            if (purchases[_buyer][i].media_id == _media_id)
-                return false;
-        }
-
-        return true;
-    }
-
-    /////////////////////////////////////////////////////////////////////////
-
     function buy_media (uint256 _media_id, uint _customer_type) public payable {
 
         // Require a valid media
         require(_media_id > 0 && _media_id <= media_count);
 
         // Require that they haven't already bought the same media before
-        require(not_already_purchased(msg.sender, _media_id));
+        require(purchases[msg.sender][_media_id].purchased == false);
 
         Media memory M = media_store[_media_id];
 
@@ -148,7 +137,7 @@ contract MediaMarket {
         M.creator.transfer(cost - stakeholders_total);
 
         // Record that a buyer has bought a media
-        purchases[msg.sender].push(PurchaseRecord(_media_id, ""));
+        purchases[msg.sender][_media_id] = PurchaseRecord(true, "");
 
         emit evConsumerWantsToBuy(msg.sender, _media_id);
     }
@@ -173,10 +162,7 @@ contract MediaMarket {
         require(msg.sender == media.creator);
 
         // Save URL into a mapping so buyer can access it later
-        for (uint i = 0; i < purchases[_buyer].length; i++) {
-            if (purchases[_buyer][i].media_id == _media_id)
-                purchases[_buyer][i].url = _url;
-        }
+        purchases[_buyer][_media_id].url = _url;
 
         emit evURLForMedia(_buyer, _media_id, _url);
     }
