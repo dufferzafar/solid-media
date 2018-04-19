@@ -272,9 +272,6 @@ contract("MediaMarket", function(accounts) {
         let observed_url = "X";
         let expected_url = "Y";
 
-        // We'll try things out with media 1
-        let media_id = 1;
-
         // TODO: Find a way to extract the public key from a buyer's address (using on-chain data)
         let buyers_pub_key = "03463c760cabfe2ea0529c0335656fd12b0c81fc40c478d197ae7384f197bfca1b";
 
@@ -284,10 +281,16 @@ contract("MediaMarket", function(accounts) {
         async function creator_ev_handler(error, event) {
             if (!error) {
                 let buyers_address = event.args.buyer;
-                // purchase_id = event.args.purchase_id;
+                let media_id = event.args.media_id;
+
+                // A creator knows URLs to all media
+                let media_urls = {
+                    1: "http://creator.storage.com/media/1",
+                    2: "http://creator.storage.com/media/2"
+                }
 
                 // TODO: A dict of URLs for other media ?!
-                let plain_url = "http://www.google.com";
+                let plain_url = media_urls[media_id];
                 expected_url = plain_url;
 
                 let encrypted_url = await EthEnc.encryptWithPublicKey(buyers_pub_key, plain_url);
@@ -344,11 +347,8 @@ contract("MediaMarket", function(accounts) {
         let url_event = market.evURLForMedia({}, {});
         url_event.watch(buyer_ev_handler);
 
-        // FIXME: Enabling these lines prevents buyer_ev_handler from ending
-        // media = await market.media_store(media_id);
-        // media_cost = media[3];
-
-        await market.buy_media(media_id, INDIVIDUAL, {from: buyer, value: 1000 * finney});
+        // Initiate a purchase for media 1
+        await market.buy_media(1, INDIVIDUAL, {from: buyer, value: 1000 * finney});
     });
 
     // TODO: Write failure tests
