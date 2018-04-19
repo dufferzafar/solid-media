@@ -12,10 +12,7 @@ const ether = Math.pow(10, 18);
 
 // Type of consumer
 const INDIVIDUAL = 0;
-// const COMPANY = 1;
-
-// TODO: Change account indices of all?
-// TODO: Go through the tests
+const COMPANY = 1;
 
 // These tests are not really unit tests, since a lot of them
 // depend on other tests to run (which modify state)
@@ -163,7 +160,7 @@ contract("MediaMarket", function(accounts) {
         assert(purchased_record[0] == true);
     });
 
-    it("fails when buying same media again", async function() {
+    it("fails when buying a media again", async function() {
         let media_id = 2;
         let buyer = accounts[0];
 
@@ -171,7 +168,23 @@ contract("MediaMarket", function(accounts) {
         let media = await market.media_store(media_id);
         let media_cost = media[3];
 
+        // Media 2 was bought by accounts[0] above
+        // Buying it again should fail!
         assert.isRejected(market.buy_media(media_id, INDIVIDUAL, {from: buyer, value: media_cost}));
+    });
+
+    it("allows buying as a company", async function() {
+        let media_id = 2;
+        let buyer = accounts[1];
+
+        // Find proper costs of the media
+        let media = await market.media_store(media_id);
+        let media_cost = media[4]; // For company
+
+        // Buy it
+        await market.buy_media(media_id, COMPANY, {from: buyer, value: media_cost});
+        purchased_record = await market.purchases(buyer, media_id);
+        assert(purchased_record[0] == true);
     });
 
     it("fails when paying anything except the right cost", async function() {
