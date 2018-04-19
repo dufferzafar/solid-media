@@ -4,11 +4,11 @@ const MediaMarket = artifacts.require("./MediaMarket.sol");
 
 // Ethereum Units
 const finney = Math.pow(10, 15);
-const ether = Math.pow(10, 18);
+// const ether = Math.pow(10, 18);
 
 // Type of consumer
 const INDIVIDUAL = 0;
-const COMPANY = 1;
+// const COMPANY = 1;
 
 contract("MediaMarket", function(accounts) {
     let market; // Will store an instance of our contract
@@ -150,11 +150,11 @@ contract("MediaMarket", function(accounts) {
 
         // Ensure that it was bought
         purchased_media = await market.purchases(buyer, 0);
-		console.log(purchased_media);
+        // console.log(purchased_media);
         assert.equal(purchased_media[0], media_id);
     });
-	
-	it("fails when trying to buy same media again", async function() {
+
+    it("fails when trying to buy same media again", async function() {
         media_id = 2;
         buyer = accounts[0];
 
@@ -162,19 +162,17 @@ contract("MediaMarket", function(accounts) {
         media = await market.media_store(media_id);
         media_cost = media[3];
 
-        // Buy it
-		// Try adding same stakeholder; should fail!
+        // Try Buying it; should fail!
         try {
             await market.buy_media(media_id, INDIVIDUAL, {from: buyer, value: media_cost});
         } catch (e) {
             assert(e.message.endsWith("revert"));
         }
-        
 
         // Ensure that it was bought
-        //purchased_media = await market.purchases(buyer, 0);
-		//console.log(purchased_media);
-        //assert.equal(purchased_media[0], media_id);
+        // purchased_media = await market.purchases(buyer, 0);
+        // console.log(purchased_media);
+        // assert.equal(purchased_media[0], media_id);
     });
 
     it("triggers an event when buying", async function() {
@@ -237,7 +235,7 @@ contract("MediaMarket", function(accounts) {
         async function creator_ev_handler(error, event) {
             if (!error) {
                 buyers_address = event.args.buyer;
-				//purchase_id = event.args.purchase_id;
+                // purchase_id = event.args.purchase_id;
 
                 // TODO: A dict of URLs for other media ?!
                 plain_url = "http://www.google.com";
