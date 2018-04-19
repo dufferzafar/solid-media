@@ -192,13 +192,18 @@ contract("MediaMarket", function(accounts) {
         let buyer = accounts[1];
 
         assert.isRejected(
+            market.buy_media(media_id, INDIVIDUAL, {from: buyer}),
+            /revert/, "can't buy for free"
+        );
+
+        assert.isRejected(
             market.buy_media(media_id, INDIVIDUAL, {from: buyer, value: 0}),
             /revert/, "can't buy for free"
         );
 
         // Find proper cost of the media
         let media = await market.media_store(media_id);
-        let media_cost = media[3];
+        let media_cost = media[3]; // For individuals
 
         assert.isRejected(
             market.buy_media(media_id, INDIVIDUAL, {from: buyer, value: media_cost + 1}),
@@ -208,6 +213,11 @@ contract("MediaMarket", function(accounts) {
         assert.isRejected(
             market.buy_media(media_id, INDIVIDUAL, {from: buyer, value: media_cost + 1}),
             /revert/, "can't pay less"
+        );
+
+        assert.isRejected(
+            market.buy_media(media_id, COMPANY, {from: buyer, value: media_cost}),
+            /revert/, "can't pay individual's cost if you're a company"
         );
     });
 
@@ -300,7 +310,7 @@ contract("MediaMarket", function(accounts) {
     //                          Full Integration Test
     // /////////////////////////////////////////////////////////////////////////
 
-    it("fully works", async function() {
+    it("forwards the URL to the buyer", async function() {
         // These values will be filled by the creator/buyer
         // Initial values should be different!
         // so we can show that everything is working correctly.
@@ -384,15 +394,4 @@ contract("MediaMarket", function(accounts) {
         // Initiate a purchase for media 1
         await market.buy_media(1, INDIVIDUAL, {from: buyer, value: 1000 * finney});
     });
-
-    // TODO: Write failure tests
-    // it("fails when buyer has insufficient balance");
-    // it("fails when stakeholder shares don't sum up to 100");
-
-    // it("doesn't allow buying a media again");
-    // it("returns encrypted URL if media is already bought");
-
-    // it("deducts the right cost for individual")
-    // it("deducts the right cost for company")
-    // it("fails when paying anything except the right cost")
 });
