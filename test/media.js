@@ -242,7 +242,7 @@ contract("MediaMarket", function(accounts) {
         // Get all stakeholders of media 2
         parties = [];
         total_stake_share = 0;
-        for (var i = 1; i <= stakeholder_count; i++) {
+        for (let i = 1; i <= stakeholder_count; i++) {
             let h = await market.get_stakeholder(media_id, i);
             let holder = {addr: h[0].toString(), share: h[1].toNumber()};
 
@@ -254,10 +254,10 @@ contract("MediaMarket", function(accounts) {
         parties.push({addr: media_creator, share: 100 - total_stake_share});
 
         // Find balances of all involved parties, before
-        bal_before = parties.map(h => web3.eth.getBalance(h.addr).toNumber());
+        bal_before = parties.map((h) => web3.eth.getBalance(h.addr).toNumber());
 
         // Sanity check
-        assert.equal(bal_before.length, 6)
+        assert.equal(bal_before.length, 6);
 
         // Buy the media
         await market.buy_media(
@@ -265,7 +265,7 @@ contract("MediaMarket", function(accounts) {
         );
 
         // Find balances of all involved parties, after
-        bal_after = parties.map(h => web3.eth.getBalance(h.addr).toNumber());
+        bal_after = parties.map((h) => web3.eth.getBalance(h.addr).toNumber());
 
         // Confirm that every party got their share
         parties.forEach((h, i) => assert.equal(bal_after[i], bal_before[i] + (h.share / 100) * media_cost));
@@ -302,9 +302,11 @@ contract("MediaMarket", function(accounts) {
 
                 encrypted_url = await EthEnc.encryptWithPublicKey(buyers_pub_key, plain_url);
 
-                // Send the URL back to contract who will forward to buyer
                 // console.log("Sending URL to contract: " + encrypted_url);
-                // TODO: Add failure test for creator?
+
+                // TODO: Add failure test if someone else tries to send instead of creator?
+
+                // Send the URL back to contract who will forward to buyer
                 await market.url_for_media(
                     buyers_address, media_id, encrypted_url, {from: accounts[3]}
                 );
@@ -331,13 +333,17 @@ contract("MediaMarket", function(accounts) {
                 // React only if this message was meant for me
                 // Other people won't be able to decrypt this message anyway
                 if (event.args.buyer == buyer) {
-                    decrypted_url = await EthEnc.decryptWithPrivateKey(buyers_pvt_key, event.args.url);
+                    encrypted_url = event.args.url;
+                    decrypted_url = await EthEnc.decryptWithPrivateKey(buyers_pvt_key, encrypted_url);
 
                     observed_url = decrypted_url;
 
                     // console.log("Received URL for media " + event.args.media_id + " is " + decrypted_url);
-
                     assert.equal(observed_url, expected_url);
+
+                    // Confirm that the encrypted URL was stored on the chain
+                    purchased_media = await market.purchases(buyer, 0);
+                    assert.equal(purchased_media[1], encrypted_url);
 
                     // I got what I wanted, game over!
                     url_event.stopWatching();
@@ -365,6 +371,5 @@ contract("MediaMarket", function(accounts) {
 
     // it("deducts the right cost for individual")
     // it("deducts the right cost for company")
-
-    // it("stores the encrypted URL")
+    // it("fails when paying anything except the right cost")
 });
