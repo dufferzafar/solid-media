@@ -167,6 +167,30 @@ contract("MediaMarket", function(accounts) {
         assert.isRejected(market.buy_media(media_id, INDIVIDUAL, {from: buyer, value: media_cost}));
     });
 
+    it("fails when paying anything except the right cost", async function() {
+        let media_id = 1;
+        let buyer = accounts[1];
+
+        assert.isRejected(
+            market.buy_media(media_id, INDIVIDUAL, {from: buyer, value: 0}),
+            /revert/, "can't buy for free"
+        );
+
+        // Find proper cost of the media
+        let media = await market.media_store(media_id);
+        let media_cost = media[3];
+
+        assert.isRejected(
+            market.buy_media(media_id, INDIVIDUAL, {from: buyer, value: media_cost + 1}),
+            /revert/, "can't pay more"
+        );
+
+        assert.isRejected(
+            market.buy_media(media_id, INDIVIDUAL, {from: buyer, value: media_cost + 1}),
+            /revert/, "can't pay less"
+        );
+    });
+
     it("triggers an event when buying", async function() {
         let buyer = accounts[1];
 
