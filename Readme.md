@@ -43,3 +43,7 @@ Off-chain processing:
 - https://ethereum.stackexchange.com/questions/3092/how-to-encrypt-a-message-with-the-public-key-of-an-ethereum-address
 
 - https://ethereum.stackexchange.com/questions/15442/whats-a-recommended-way-to-pass-secret-in-solidity
+
+## Grading by TA
+
+We scored 19/20 on the assignment. 1 mark was deducted on some theoretical question, that we didn't even understand.
