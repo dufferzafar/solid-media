@@ -3,15 +3,18 @@
 
 An Ethereum smart contract for licensed media distribution. 
 
+![Screenshot](screenshot.png)
+
 ## Stack
 
 * [Solidity](http://solidity.readthedocs.io/) for the core smart contract code.
 * [Ganache](http://truffleframework.com/ganache/) to run a local Ethereum testnet. I used the GUI, but `ganache-cli` will work as well.
 * [Truffle](https://github.com/trufflesuite/truffle) to manage the dev environment - compile contract, interact with local testnet and run tests.
-* [MetaMask](https://metamask.io/) as the bridge between the browser and the dapp?
 * [Solium](https://github.com/duaraghav8/Solium) to lint the contract for style and security best practices.
 * [Mocha](https://mochajs.org/) & [Chai](http://www.chaijs.com/) for writing unit tests.
-* General HTML/CSS (Bootstrap)/JS for the Web UI.
+* [ES Lint](https://eslint.org/) for linting the JS tests.
+* ~~General HTML/CSS (Bootstrap)/JS for the Web UI.~~
+* ~~[MetaMask](https://metamask.io/) as the bridge between the browser and the dapp?~~
 
 ## Building
 
@@ -46,4 +49,4 @@ Off-chain processing:
 
 ## Grading by TA
 
-We scored 19/20 on the assignment. 1 mark was deducted on some theoretical question, that we didn't even understand.
+We scored 19/20 on the assignment. 1 mark was deducted on some theoretical question that we didn't even understand.
